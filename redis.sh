@@ -27,6 +27,6 @@ node MarketDataHandling.js exchange=binance source=binance.spot.depth destinatio
 ############# Trading Logic #############
 node TradingLogic.js exchange=coinbase source=aggregates destination=fast_api strategy=market_maker depth=5 price=vwap metric=ewma lambda=0.94
 
-node TradingLogic.js exchange=coinbase source=aggregates destination=fast_api strategy=market_maker
+node TradingLogic.js exchange=coinbase source=aggregates destination=analysys strategy=market_maker
 
-node TradingLogic.js exchange=binance source=tri_arb destination=fast_api strategy=triangular_arbitrage
+node TradingLogic.js exchange=binance source=tri_arb destination=analysys strategy=triangular_arbitrage
