@@ -32,7 +32,6 @@ consumer.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
     let handledData = handler(data);
-    console.log(handledData);
 
     producer.publish(destination, JSON.stringify(handledData), (err, count) => {
       if (err) {

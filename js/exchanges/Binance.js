@@ -71,8 +71,6 @@ class Binance extends Exchange {
     const asks = response.a.sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]));
     const bids = response.b.sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]));
     const timestamp = response.T;
-    console.log(response);
-
     return { exchange, market, channel, symbol, asks, bids, timestamp };
   }
 
