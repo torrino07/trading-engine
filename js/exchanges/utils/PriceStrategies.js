@@ -1,7 +1,7 @@
 const BigNumber = require("bignumber.js");
 
 class Mid {
-  calculate(data, decimals, depth=0) {
+  calculate(data, decimals, depth = 0) {
     const highestBid = new BigNumber(data.bids[depth][0]);
     const lowestAsk = new BigNumber(data.asks[data.asks.length - 1][0]);
     const midPrice = highestBid.plus(lowestAsk).dividedBy(2);
@@ -10,18 +10,17 @@ class Mid {
 }
 
 class VWAP {
-  calculate(data, decimals, depth=5) {
-
+  calculate(data, decimals, depth) {
     let totalVolume = new BigNumber(0);
     let totalPriceVolume = new BigNumber(0);
-    
-    const combined = [...data.bids, ...data.asks];
 
-    console.log(data.asks, data.bids)
-    
+    const combined = [...data.bids.slice(depth), ...data.asks.slice(-depth)];
+
     for (let i = 0; i < combined.length; i++) {
       const [price, volume] = combined[i];
-      totalPriceVolume = totalPriceVolume.plus(new BigNumber(price).times(volume));
+      totalPriceVolume = totalPriceVolume.plus(
+        new BigNumber(price).times(volume)
+      );
       totalVolume = totalVolume.plus(volume);
     }
 

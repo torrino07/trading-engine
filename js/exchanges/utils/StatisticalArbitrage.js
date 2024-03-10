@@ -8,7 +8,7 @@ class StatisticalArbitrage {
     this.ewma_mid = MetricsFactory.createMetric("ewma");
     this.ewma_vwap = MetricsFactory.createMetric("ewma");
     this.depth = parseFloat(config.depth);
-    this.lambda = config.lambda;
+    this.lambda = parseFloat(config.lambda);
     this.steps = parseFloat(config.steps);
     this.size = parseFloat(config.size);
   }
@@ -23,7 +23,7 @@ class StatisticalArbitrage {
       const ewma_mid = this.ewma_mid.calculate(mid, this.lambda, this.steps);
       const ewma_vwap = this.ewma_vwap.calculate(vwap, this.lambda, this.steps);
 
-      // console.log("EWMA:", { exchange, market, channel, symbol, mid, vwap, ewma_mid, ewma_vwap});
+      console.log("EWMA:", { exchange, market, channel, symbol, mid, vwap, ewma_mid, ewma_vwap});
     } else if (channel === "trades") {
     } else {
       console.log(

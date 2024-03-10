@@ -25,7 +25,7 @@ node MarketDataHandling.js exchange=binance source=binance.futures.trades destin
 node MarketDataHandling.js exchange=binance source=binance.spot.depth destination=tri_arb
 
 ############# Trading Logic #############
-node TradingLogic.js exchange=coinbase source=aggregates destination=fast_api strategy=statistical_arbitrage depth=5 lambda=0.94 steps=2 size=2
+node TradingLogic.js exchange=coinbase source=aggregates destination=fast_api strategy=statistical_arbitrage depth=3 lambda=0.94 steps=2 size=2
 
 node TradingLogic.js exchange=coinbase source=aggregates destination=fast_api strategy=avellaneda_stoikov
 
