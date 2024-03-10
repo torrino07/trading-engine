@@ -2,6 +2,7 @@ const ExchangeFactory = require("./exchanges/ExchangeFactory");
 const TaskManager = require("./exchanges/utils/TaskManager");
 const Redis = require("ioredis");
 
+const pid = process.pid;
 const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
