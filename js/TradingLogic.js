@@ -31,7 +31,7 @@ consumer.subscribe(source, (err, count) => {
   consumer.on("message", (channel, message) => {
     try {
       const data = JSON.parse(message);
-      strategy.execute(data)
+      // output goes to fast api channel strategy.execute(data)
 
       const msg = `hey, fast api! I am Trading Logic: ${pid}`
   

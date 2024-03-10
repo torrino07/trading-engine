@@ -11,7 +11,6 @@ class MarketMaker {
   }
 
   execute(data) {
-    console.log(data)
     return data
 
     // if (channel === "depth") {
