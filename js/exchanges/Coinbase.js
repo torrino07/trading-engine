@@ -31,16 +31,20 @@ class Coinbase extends Exchange {
     );
   }
 
-  handleSpotDepth(data) {}
+  handleSpotDepth(data) {
+    return data;
+  }
 
-  handleSpotTrades(data) {}
+  handleSpotTrades(data) {
+    return data;
+  }
 
   handleFuturesDepth(data) {
-    // Logic for handling spot depth data
+    return data;
   }
 
   handleFuturesTrades(data) {
-    // Logic for handling futures depth data
+    return data;
   }
 }
 

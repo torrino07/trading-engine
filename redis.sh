@@ -15,15 +15,17 @@ payload="{\"exchange\":\"$exchange\", \"market\":\"$market\", \"channel\":\"$cha
 redis-cli PUBLISH "$topic" "$payload"
 
 ############# Market Data Handling #############
-node MarketDataHandling.js exchange=binance market=spot in=depth out=book
+node MarketDataHandling.js exchange=binance source=binance.spot.depth destination=market_maker
 
-node MarketDataHandling.js exchange=binance market=spot in=trades out=executions
+node MarketDataHandling.js exchange=binance source=binance.spot.trades destination=market_maker
 
-node MarketDataHandling.js exchange=binance market=futures in=depth out=book
+node MarketDataHandling.js exchange=binance source=binance.futures.depth destination=market_maker
 
-node MarketDataHandling.js exchange=binance market=futures in=trades out=executions
+node MarketDataHandling.js exchange=binance source=binance.futures.trades destination=market_maker
+
+node MarketDataHandling.js exchange=binance source=binance.spot.depth destination=triangul_arbitrage
 
 ############# Trading Logic #############
-node TradingLogic.js exchanges=binance markets=spot in=book strategy=MarketMaker
+node TradingLogic.js source=market_maker strategy=market_maker depth=5 
 
-node TradingLogic.js exchanges=binance markets=spot in=book strategy=TriangularArbitrage
+node TradingLogic.js source=triangul_arbitrage strategy=triangul_arbitrage
