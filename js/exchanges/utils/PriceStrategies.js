@@ -1,11 +1,23 @@
 const BigNumber = require("bignumber.js");
 
+class Mid {
+  calculate(data, decimals, depth=0) {
+    const highestBid = new BigNumber(data.bids[depth][0]);
+    const lowestAsk = new BigNumber(data.asks[data.asks.length - 1][0]);
+    const midPrice = highestBid.plus(lowestAsk).dividedBy(2);
+    return midPrice.toFixed(decimals);
+  }
+}
+
 class VWAP {
-  calculate(data, decimals) {
+  calculate(data, decimals, depth=5) {
+
     let totalVolume = new BigNumber(0);
     let totalPriceVolume = new BigNumber(0);
     
     const combined = [...data.bids, ...data.asks];
+
+    console.log(data.asks, data.bids)
     
     for (let i = 0; i < combined.length; i++) {
       const [price, volume] = combined[i];
@@ -17,15 +29,6 @@ class VWAP {
 
     const vwap = totalPriceVolume.dividedBy(totalVolume);
     return vwap.toFixed(decimals);
-  }
-}
-
-class Mid {
-  calculate(data, decimals) {
-    const highestBid = new BigNumber(data.bids[0][0]);
-    const lowestAsk = new BigNumber(data.asks[data.asks.length - 1][0]);
-    const midPrice = highestBid.plus(lowestAsk).dividedBy(2);
-    return midPrice.toFixed(decimals);
   }
 }
 
