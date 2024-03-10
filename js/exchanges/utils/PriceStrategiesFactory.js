@@ -1,8 +1,8 @@
 const { Mid, VWAP } = require("./PriceStrategies");
 
 class PriceStrategyFactory {
-  static createPriceStrategy(config) {
-    switch (config.price) {
+  static createPriceStrategy(strategy) {
+    switch (strategy) {
       case "mid":
         return new Mid();
       case "vwap":

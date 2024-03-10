@@ -1,8 +1,8 @@
 const { EWMA } = require("./Metrics");
 
 class MetricsFactory {
-  static createMetric(config) {
-    switch (config.metric) {
+  static createMetric(metric) {
+    switch (metric) {
       case "ewma":
         return new EWMA();
       default:

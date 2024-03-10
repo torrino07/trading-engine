@@ -13,6 +13,7 @@ let config = argv.reduce((acc, current) => {
   return acc;
 }, {});
 
+console.log(config)
 let source = config.source;
 let destination = config.destination;
 
