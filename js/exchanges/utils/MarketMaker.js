@@ -10,8 +10,7 @@ class MarketMaker {
   execute(data) {
     // Implement market making logic using the calculated price
     console.log(`Market Maker Strategy`);
-    console.log(this.priceStrategy.calculate());
-    console.log(this.metric.calculate())
+    console.log(data)
   }
 }
 

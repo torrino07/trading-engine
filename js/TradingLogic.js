@@ -18,36 +18,35 @@ let destination = config.destination;
 
 let exchange = ExchangeFactory.createExchange(config.exchange)
 let strategy = StrategyFactory.createStrategy(config);
-strategy.execute()
 
-// consumer.subscribe(source, (err, count) => {
-//     if (err) {
-//       console.error("Failed to subscribe:", err.message);
-//       return;
-//     }
-//     console.log(`Subscribed to ${count} channel(s).`);
-//   });
+consumer.subscribe(source, (err, count) => {
+    if (err) {
+      console.error("Failed to subscribe:", err.message);
+      return;
+    }
+    console.log(`Subscribed to ${count} channel(s).`);
+  });
   
-//   consumer.on("message", (channel, message) => {
-//     try {
-//       const data = JSON.parse(message);
-//       console.log(data)
+  consumer.on("message", (channel, message) => {
+    try {
+      const data = JSON.parse(message);
+      strategy.execute(data)
 
-//       const msg = `hey, fast api! I am Trading Logic: ${pid}`
+      const msg = `hey, fast api! I am Trading Logic: ${pid}`
   
-//       producer.publish(destination, msg, (err, count) => {
-//         if (err) {
-//           console.error("Failed to produce message:", err.message);
-//           return;
-//         }
-//       });
-//     } catch (error) {
-//       console.error("Error parsing JSON message:", error);
-//     }
-//   });
+      producer.publish(destination, msg, (err, count) => {
+        if (err) {
+          console.error("Failed to produce message:", err.message);
+          return;
+        }
+      });
+    } catch (error) {
+      console.error("Error parsing JSON message:", error);
+    }
+  });
   
-//   process.on("SIGINT", () => {
-//     consumer.disconnect();
-//     producer.disconnect();
-//     process.exit();
-//   });
+  process.on("SIGINT", () => {
+    consumer.disconnect();
+    producer.disconnect();
+    process.exit();
+  });
