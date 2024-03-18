@@ -3,6 +3,7 @@ class TriangularArbitrage {
     this.name = "TriangularArbitrage";
     this.message = new String();
   }
+  
   run(data) {}
 }
 

@@ -1,9 +1,7 @@
-const Exchange = require("./Exchange");
 const TaskManager = require("../utils/TaskManager");
 
-class Coinbase extends Exchange {
+class Coinbase {
   constructor() {
-    super("Coinbase");
     this.registerTask();
   }
 

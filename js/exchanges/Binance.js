@@ -1,9 +1,7 @@
-const Exchange = require("./Exchange");
 const TaskManager = require("../utils/TaskManager");
 
-class Binance extends Exchange {
+class Binance {
   constructor() {
-    super("Binance");
     this.registerTask();
   }
 

@@ -6,6 +6,7 @@ class Development {
     this.name = "Development";
     this.message = new String();
   }
+  
   run(data) {
     console.log(data);
   }
