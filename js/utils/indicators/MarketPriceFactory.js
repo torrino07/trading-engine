@@ -1,11 +1,11 @@
-const { Mid, VWAP } = require("./PriceStrategies");
-
-class PriceStrategyFactory {
+class MarketPriceFactory {
   static createPriceStrategy(strategy) {
     switch (strategy) {
       case "mid":
+        const { Mid } = require("./MidPrice");
         return new Mid();
       case "vwap":
+        const { VWAP } = require("./VolumeWeightedAveragePrice");
         return new VWAP();
       default:
         throw new Error("Invalid price strategy");
@@ -13,4 +13,4 @@ class PriceStrategyFactory {
   }
 }
 
-module.exports = PriceStrategyFactory;
+module.exports = MarketPriceFactory;

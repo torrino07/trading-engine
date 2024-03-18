@@ -1,34 +1,33 @@
 const Exchange = require("./Exchange");
-const TaskManager = require("./utils/TaskManager");
+const TaskManager = require("../utils/TaskManager");
 
 class Binance extends Exchange {
   constructor() {
     super("Binance");
+    this.registerTask();
   }
 
-  registerTaskHandlers() {
-    const tasks = [
-      {
-        identifier: "binance.spot.depth",
-        handler: this.handleSpotDepth.bind(this),
-      },
-      {
-        identifier: "binance.spot.trades",
-        handler: this.handleSpotTrades.bind(this),
-      },
-      {
-        identifier: "binance.futures.depth",
-        handler: this.handleFuturesDepth.bind(this),
-      },
-      {
-        identifier: "binance.futures.trades",
-        handler: this.handleFuturesTrades.bind(this),
-      },
-    ];
-
-    tasks.forEach(({ identifier, handler }) =>
-      TaskManager.registerHandler(identifier, handler)
+  registerTask() {
+    TaskManager.registerHandler(
+      "binance.spot.depth",
+      this.handleSpotDepth.bind(this)
     );
+    TaskManager.registerHandler(
+      "binance.spot.trades",
+      this.handleSpotTrades.bind(this)
+    );
+    TaskManager.registerHandler(
+      "binance.futures.depth",
+      this.handleFuturesDepth.bind(this)
+    );
+    TaskManager.registerHandler(
+      "binance.futures.trades",
+      this.handleFuturesTrades.bind(this)
+    );
+  }
+
+  getHandler(taskIdentifier) {
+    return TaskManager.getHandler(taskIdentifier);
   }
 
   handleSpotDepth(data) {

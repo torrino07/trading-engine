@@ -1,34 +1,33 @@
 const Exchange = require("./Exchange");
-const TaskManager = require("./utils/TaskManager");
+const TaskManager = require("../utils/TaskManager");
 
 class Coinbase extends Exchange {
   constructor() {
     super("Coinbase");
+    this.registerTask();
   }
 
-  registerTaskHandlers() {
-    const tasks = [
-      {
-        identifier: "coinbase.spot.depth",
-        handler: this.handleSpotDepth.bind(this),
-      },
-      {
-        identifier: "coinbase.spot.trades",
-        handler: this.handleSpotTrades.bind(this),
-      },
-      {
-        identifier: "coinbase.futures.depth",
-        handler: this.handleFuturesDepth.bind(this),
-      },
-      {
-        identifier: "coinbase.futures.trades",
-        handler: this.handleFuturesTrades.bind(this),
-      },
-    ];
-
-    tasks.forEach(({ identifier, handler }) =>
-      TaskManager.registerHandler(identifier, handler)
+  registerTask() {
+    TaskManager.registerHandler(
+      "coinbase.spot.depth",
+      this.handleSpotDepth.bind(this)
     );
+    TaskManager.registerHandler(
+      "coinbase.spot.trades",
+      this.handleSpotTrades.bind(this)
+    );
+    TaskManager.registerHandler(
+      "coinbase.futures.depth",
+      this.handleFuturesDepth.bind(this)
+    );
+    TaskManager.registerHandler(
+      "coinbase.futures.trades",
+      this.handleFuturesTrades.bind(this)
+    );
+  }
+
+  getHandler(taskIdentifier) {
+    return TaskManager.getHandler(taskIdentifier);
   }
 
   handleSpotDepth(data) {

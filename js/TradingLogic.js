@@ -1,5 +1,5 @@
 const ExchangeFactory = require("./exchanges/ExchangeFactory");
-const StrategyFactory = require("./exchanges//utils/StrategyFactory");
+const StrategyFactory = require("./strategies/StrategyFactory");
 const Redis = require("ioredis");
 
 const pid = process.pid;
@@ -13,41 +13,47 @@ let config = argv.reduce((acc, current) => {
   return acc;
 }, {});
 
-console.log(config)
+console.log(config);
+let exchangeName = config.exchange;
 let source = config.source;
 let destination = config.destination;
 
-let exchange = ExchangeFactory.createExchange(config.exchange)
+let exchange = ExchangeFactory.createExchange(exchangeName);
 let strategy = StrategyFactory.createStrategy(config);
 
 consumer.subscribe(source, (err, count) => {
-    if (err) {
-      console.error("Failed to subscribe:", err.message);
-      return;
-    }
-    console.log(`Subscribed to ${count} channel(s).`);
-  });
-  
-  consumer.on("message", (channel, message) => {
-    try {
-      const data = JSON.parse(message);
-      strategy.execute(data)
+  if (err) {
+    console.error("Failed to subscribe:", err.message);
+    return;
+  }
+  console.log(`Subscribed to ${count} channel(s).`);
+});
 
-      const msg = `hey, fast api! I am Trading Logic: ${pid}`
-  
-      producer.publish(destination, msg, (err, count) => {
-        if (err) {
-          console.error("Failed to produce message:", err.message);
-          return;
-        }
-      });
-    } catch (error) {
-      console.error("Error parsing JSON message:", error);
-    }
-  });
-  
-  process.on("SIGINT", () => {
-    consumer.disconnect();
-    producer.disconnect();
-    process.exit();
-  });
+consumer.on("message", (channel, message) => {
+  try {
+    const data = JSON.parse(message);
+    strategy.run(data);
+
+    let msg = {
+      pid: pid,
+      exchange: exchangeName,
+      strategy: strategy.name,
+      message: strategy.message,
+    };
+
+    producer.publish(destination, JSON.stringify(msg), (err, count) => {
+      if (err) {
+        console.error("Failed to produce message:", err.message);
+        return;
+      }
+    });
+  } catch (error) {
+    console.error("Error parsing JSON message:", error);
+  }
+});
+
+process.on("SIGINT", () => {
+  consumer.disconnect();
+  producer.disconnect();
+  process.exit();
+});

@@ -1,19 +1,21 @@
-const PriceStrategyFactory = require("./PriceStrategiesFactory");
-const MetricsFactory = require("./MetricsFactory");
+const MarketPriceFactory = require("../utils/indicators/MarketPriceFactory");
+const IndicatorsFactory = require("../utils/indicators/IndicatorsFactory");
 
 class StatisticalArbitrage {
   constructor(config) {
-    this.mid = PriceStrategyFactory.createPriceStrategy("mid");
-    this.vwap = PriceStrategyFactory.createPriceStrategy("vwap");
-    this.ewma_mid = MetricsFactory.createMetric("ewma");
-    this.ewma_vwap = MetricsFactory.createMetric("ewma");
+    this.name = "StatisticalArbitrage";
+    this.message = new String();
+    this.mid = MarketPriceFactory.createPriceStrategy("mid");
+    this.vwap = MarketPriceFactory.createPriceStrategy("vwap");
+    this.ewma_mid = IndicatorsFactory.createMetric("ewma");
+    this.ewma_vwap = IndicatorsFactory.createMetric("ewma");
     this.depth = parseFloat(config.depth);
     this.lambda = parseFloat(config.lambda);
     this.steps = parseFloat(config.steps);
     this.size = parseFloat(config.size);
   }
 
-  execute(data) {
+  run(data) {
     const { exchange, market, channel, symbol } = data;
 
     if (channel === "depth") {
@@ -23,7 +25,16 @@ class StatisticalArbitrage {
       const ewma_mid = this.ewma_mid.calculate(mid, this.lambda, this.steps);
       const ewma_vwap = this.ewma_vwap.calculate(vwap, this.lambda, this.steps);
 
-      console.log("EWMA:", { exchange, market, channel, symbol, mid, vwap, ewma_mid, ewma_vwap});
+      console.log("EWMA:", {
+        exchange,
+        market,
+        channel,
+        symbol,
+        mid,
+        vwap,
+        ewma_mid,
+        ewma_vwap,
+      });
     } else if (channel === "trades") {
     } else {
       console.log(

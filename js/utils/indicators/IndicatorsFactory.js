@@ -1,9 +1,8 @@
-const { EWMA } = require("./Metrics");
-
-class MetricsFactory {
+class IndicatorsFactory {
   static createMetric(metric) {
     switch (metric) {
       case "ewma":
+        const { EWMA } = require("./ExponentialWeightedMovingAverage");
         return new EWMA();
       default:
         throw new Error("Invalid price calculator type");
@@ -11,4 +10,4 @@ class MetricsFactory {
   }
 }
 
-module.exports = MetricsFactory;
+module.exports = IndicatorsFactory;

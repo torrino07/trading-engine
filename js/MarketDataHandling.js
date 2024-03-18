@@ -1,5 +1,4 @@
 const ExchangeFactory = require("./exchanges/ExchangeFactory");
-const TaskManager = require("./exchanges/utils/TaskManager");
 const Redis = require("ioredis");
 
 const pid = process.pid;
@@ -14,11 +13,12 @@ let config = argv.reduce((acc, current) => {
 }, {});
 
 let taskIdentifier = config.source;
+let exchangeName = config.exchange;
 let source = config.source;
 let destination = config.destination;
 
-let exchange = ExchangeFactory.createExchange(config.exchange).registerTaskHandlers();
-let handler = TaskManager.getHandler(taskIdentifier);
+let exchange = ExchangeFactory.createExchange(exchangeName);
+let handler = exchange.getHandler(taskIdentifier);
 
 consumer.subscribe(source, (err, count) => {
   if (err) {
