@@ -9,7 +9,7 @@ const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 const config = new Config();
 const indicators = new Indicators(config.getAll());
 
-let source = config.get("source");
+let source = config.get("source").split(";");
 let destination = config.get("destination");
 
 consumer.subscribe(source, (err, count) => {

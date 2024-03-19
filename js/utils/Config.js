@@ -14,7 +14,7 @@ class Config {
   }
 
   get(key) {
-    return this.config[key].split(";");;
+    return this.config[key];
   }
 
   has(key) {
