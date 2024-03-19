@@ -1,6 +1,5 @@
-const ExchangeFactory = require("./exchanges/ExchangeFactory");
-const StrategyFactory = require("./strategies/StrategyFactory");
 const Config = require("./utils/Config");
+const Indicators = require("./utils/Indicators");
 const Redis = require("ioredis");
 
 const pid = process.pid;
@@ -8,15 +7,11 @@ const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
+const indicators = new Indicators(config.getAll());
 
-let exchangeName = config.get("exchange");
 let source = config.get("source");
 let destination = config.get("destination");
 
-let exchange = ExchangeFactory.createExchange(exchangeName);
-let strategy = StrategyFactory.createStrategy(config);
-
-// FIX SOURCE TO BE MULTIPLE OR ONE CHANNEL
 consumer.subscribe(source, (err, count) => {
   if (err) {
     console.error("Failed to subscribe:", err.message);
@@ -28,15 +23,9 @@ consumer.subscribe(source, (err, count) => {
 consumer.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
-    strategy.run(data);
+    indicators.run(data);
 
-    let msg = {
-      pid: pid,
-      exchange: exchangeName,
-      strategy: strategy.name,
-      message: strategy.message,
-    };
-
+    let msg = { message: null };
     producer.publish(destination, JSON.stringify(msg), (err, count) => {
       if (err) {
         console.error("Failed to produce message:", err.message);

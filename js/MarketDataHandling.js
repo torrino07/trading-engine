@@ -1,21 +1,17 @@
 const ExchangeFactory = require("./exchanges/ExchangeFactory");
+const Config = require("./utils/Config");
 const Redis = require("ioredis");
 
 const pid = process.pid;
 const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
-const argv = process.argv.slice(2);
-let config = argv.reduce((acc, current) => {
-  const [key, value] = current.split("=");
-  acc[key] = value;
-  return acc;
-}, {});
+const config = new Config();
 
-let taskIdentifier = config.source;
-let exchangeName = config.exchange;
-let source = config.source;
-let destination = config.destination;
+let taskIdentifier = config.get("source");
+let exchangeName = config.get("exchange");
+let source = config.get("source");
+let destination = config.get("destination");
 
 let exchange = ExchangeFactory.createExchange(exchangeName);
 let handler = exchange.getHandler(taskIdentifier);

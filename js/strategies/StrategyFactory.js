@@ -1,9 +1,6 @@
 class StrategyFactory {
   static createStrategy(config) {
     switch (config.strategy) {
-      case "statistical_arbitrage":
-        const StatisticalArbitrage = require("./StatisticalArbitrage");
-        return new StatisticalArbitrage(config);
       case "avellaneda_stoikov":
         const AvellanedaStoikov = require("./AvellanedaStoikov");
         return new AvellanedaStoikov(config);
