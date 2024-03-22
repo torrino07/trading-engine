@@ -18,4 +18,4 @@ class EWMA {
   }
 }
 
-module.exports = { EWMA };
+module.exports = EWMA;

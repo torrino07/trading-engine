@@ -14,18 +14,18 @@ payload="{\"exchange\":\"$exchange\", \"market\":\"$market\", \"channel\":\"$cha
 redis-cli PUBLISH "$topic" "$payload"
 
 ############# 1. Market Data Handling #############
-node MarketDataHandling.js exchange=binance source=binance.spot.depth destination=spot.depth
+node MarketDataHandling.js exchange=binance source=binance.spot.depth destination=binance.spot.depth.stream settings=noOp
 
-node MarketDataHandling.js exchange=binance source=binance.spot.trades destination=spot.trades
+node MarketDataHandling.js exchange=binance source=binance.spot.trades destination=binance.spot.trades.stream
 
-node MarketDataHandling.js exchange=binance source=binance.futures.depth destination=futures.depth
+node MarketDataHandling.js exchange=binance source=binance.futures.depth destination=binance.futures.depth.stream
 
-node MarketDataHandling.js exchange=binance source=binance.futures.trades destination=futures.trades
-
-node MarketDataHandling.js exchange=binance source=binance.spot.depth destination=network
+node MarketDataHandling.js exchange=binance source=binance.futures.trades destination=binance.futures.trades.stream
 
 ############# 2. Data Preprocessing #############
-node DataPreprocessing.js source="spot.depth;futures.depth" destination=indicators depth=3 lambda=0.94 steps=2 size=2
+node DataPreprocessing.js source=binance.spot.depth.stream destination=indicators depth=3 lambda=0.94 steps=2 size=2
+
+node DataPreprocessing.js source=binance.futures.depth.stream destination=indicators depth=3 lambda=0.94 steps=2 size=2
 
 ############# 3. Trading Logic #############
 node TradingLogic.js exchange=binance source="spot.trades;futures.trades;indicators" destination=feedback strategy=dev

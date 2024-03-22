@@ -35,12 +35,8 @@ class Binance {
     const response = data.data;
     const streamArray = data.stream.split("@");
     const symbol = streamArray[0].toUpperCase();
-    const asks = response.asks.sort(
-      (a, b) => parseFloat(b[0]) - parseFloat(a[0])
-    );
-    const bids = response.bids.sort(
-      (a, b) => parseFloat(b[0]) - parseFloat(a[0])
-    );
+    const asks = response.asks;
+    const bids = response.bids;
     const timestamp = Date.now();
 
     return { exchange, market, channel, symbol, asks, bids, timestamp };
@@ -65,9 +61,10 @@ class Binance {
     const channel = "depth";
     const response = data.data;
     const symbol = response.s;
-    const asks = response.a.sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]));
-    const bids = response.b.sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]));
+    const asks = response.a;
+    const bids = response.b;
     const timestamp = response.T;
+
     return { exchange, market, channel, symbol, asks, bids, timestamp };
   }
 

@@ -1,4 +1,5 @@
 const ExchangeFactory = require("./exchanges/ExchangeFactory");
+const PriceEstimator = require("./utils/PriceEstimator");
 const Config = require("./utils/Config");
 const Redis = require("ioredis");
 
@@ -7,14 +8,17 @@ const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
-
-let taskIdentifier = config.get("source");
-let exchangeName = config.get("exchange");
-let source = config.get("source");
-let destination = config.get("destination");
+const {
+  exchange: exchangeName,
+  source,
+  destination,
+  task,
+  estimators,
+} = config.get("MarketDataHandling");
 
 let exchange = ExchangeFactory.createExchange(exchangeName);
-let handler = exchange.getHandler(taskIdentifier);
+let priceEstimator = new PriceEstimator(estimators);
+let handler = exchange.getHandler(task);
 
 consumer.subscribe(source, (err, count) => {
   if (err) {
@@ -28,13 +32,19 @@ consumer.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
     let handledData = handler(data);
+    let processedData = priceEstimator.execute(handledData);
+    console.log(processedData);
 
-    producer.publish(destination, JSON.stringify(handledData), (err, count) => {
-      if (err) {
-        console.error("Failed to produce message:", err.message);
-        return;
+    producer.publish(
+      destination,
+      JSON.stringify(processedData),
+      (err, count) => {
+        if (err) {
+          console.error("Failed to produce message:", err.message);
+          return;
+        }
       }
-    });
+    );
   } catch (error) {
     console.error("Error parsing JSON message:", error);
   }
