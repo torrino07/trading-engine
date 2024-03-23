@@ -20,14 +20,11 @@ DataPreprocessing:
   source: binance.spot.depth.stream
   destination: indicators
   aggregationPeriod: 1
-  aggregationMetric:
   indicators:
     - name: log-returns
       settings:
         start: 0
         end: -1
-    - name: mean
-      settings:
     - name: ewma
       settings:
         lambda: 0.94

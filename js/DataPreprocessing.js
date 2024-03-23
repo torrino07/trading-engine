@@ -1,5 +1,4 @@
 const Config = require("./utils/Config");
-const Indicators = require("./utils/Indicators");
 const Redis = require("ioredis");
 
 const pid = process.pid;
@@ -7,10 +6,13 @@ const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
-const indicators = new Indicators(config.getAll());
-
-let source = config.get("source");
-let destination = config.get("destination");
+const {
+  exchange: exchangeName,
+  source,
+  destination,
+  aggregationPeriod,
+  indicators,
+} = config.get("DataPreprocessing");
 
 consumer.subscribe(source, (err, count) => {
   if (err) {
@@ -23,7 +25,6 @@ consumer.subscribe(source, (err, count) => {
 consumer.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
-    indicators.run(data);
 
     let msg = { message: null };
     producer.publish(destination, JSON.stringify(msg), (err, count) => {
