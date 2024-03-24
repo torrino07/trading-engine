@@ -1,7 +1,7 @@
 MarketDataHandling:
   exchange: binance
   source: binance.spot.depth
-  destination: binance.spot.depth.stream
+  destination: stream:binance.spot.depth
   task: binance.spot.depth
   estimators:
     - name: mid
@@ -15,23 +15,25 @@ MarketDataHandling:
         askIndex: 0
         arrayLength: 5
 
-DataPreprocessing:
-  exchange: binance
-  source: binance.spot.depth.stream
-  destination: indicators
-  aggregationPeriod: 1
-  indicators:
-    - name: log-returns
+MarketDataStatistics:
+  sources: [stream:binance.spot.depth.BTCUSDT]
+  destinations: indicators
+  initialNumberOfEntries: 100
+  aggregationPeriod: 15000
+  estimators:
+    - name: returns
       settings:
-        start: 0
-        end: -1
-    - name: ewma
-      settings:
-        lambda: 0.94
-    - name: garch
-      settings:
-        alpha: 0.15
-        beta: 0.8
+        decimals: 2
+    # - name: mean
+    #   settings:
+    #     decimals: 2
+    # - name: ewma
+    #   settings:
+    #     lambda: 0.94
+    # - name: garch
+    #   settings:
+    #     alpha: 0.15
+    #     beta: 0.8
     
 TradingLogic:
   exchange: binance

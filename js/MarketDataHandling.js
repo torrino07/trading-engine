@@ -1,5 +1,5 @@
 const ExchangeFactory = require("./exchanges/ExchangeFactory");
-const PriceEstimator = require("./utils/PriceEstimator");
+const PriceEstimator = require("./utils/indicators/PriceEstimator");
 const Config = require("./utils/Config");
 const Redis = require("ioredis");
 
@@ -33,18 +33,11 @@ consumer.on("message", (channel, message) => {
     const data = JSON.parse(message);
     let handledData = handler(data);
     let processedData = priceEstimator.execute(handledData);
-    console.log(processedData);
+    let symbol =  processedData.symbol;
 
-    producer.publish(
-      destination,
-      JSON.stringify(processedData),
-      (err, count) => {
-        if (err) {
-          console.error("Failed to produce message:", err.message);
-          return;
-        }
-      }
-    );
+    console.log(processedData);
+    producer.xadd(`${destination}.${symbol}` , "*", "data", JSON.stringify(processedData));
+
   } catch (error) {
     console.error("Error parsing JSON message:", error);
   }
