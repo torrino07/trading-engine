@@ -2,7 +2,7 @@ MarketDataHandling:
   exchange: binance
   source: binance.spot.depth
   destination: stream:binance.spot.depth
-  task: binance.spot.depth
+  task: binance.spot.depth.estimators
   estimators:
     - name: mid
       settings:
@@ -24,9 +24,9 @@ MarketDataStatistics:
     - name: returns
       settings:
         decimals: 2
-    # - name: mean
-    #   settings:
-    #     decimals: 2
+    - name: mean
+      settings:
+        decimals: 2
     # - name: ewma
     #   settings:
     #     lambda: 0.94

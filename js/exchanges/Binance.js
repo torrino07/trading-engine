@@ -22,6 +22,18 @@ class Binance {
       "binance.futures.trades",
       this.handleFuturesTrades.bind(this)
     );
+    TaskManager.registerHandler(
+      "binance.spot.depth.estimators",
+      this.handleSpotDepthEstimators.bind(this)
+    );
+    TaskManager.registerHandler(
+      "binance.futures.depth.estimators",
+      this.handleFuturesDepthEstimators.bind(this)
+    );
+  }
+
+  setPriceEstimator(priceEstimator) {
+    this.priceEstimator = priceEstimator;
   }
 
   getHandler(taskIdentifier) {
@@ -79,6 +91,18 @@ class Binance {
     const timestamp = response.T;
 
     return { exchange, market, channel, symbol, price, volume, timestamp };
+  }
+
+  handleSpotDepthEstimators(data) {
+    const spotDepthData = this.handleSpotDepth(data);
+    const estimatorResults = this.estimators.execute(spotDepthData);
+    return { ...spotDepthData, ...estimatorResults };
+  }
+
+  handleFuturesDepthEstimators(data) {
+    const futuresDepthData = this.handleSpotDepth(data);
+    const estimatorResults = this.estimators.execute(futuresDepthData);
+    return { ...futuresDepthData, ...estimatorResults };
   }
 }
 

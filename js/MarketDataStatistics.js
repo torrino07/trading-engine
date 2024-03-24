@@ -46,10 +46,6 @@ function processEntries(entries) {
     .map(([id, message]) => JSON.parse(message[1]))
     .filter((data) => data.vwap)
     .map((data) => data.vwap);
-
-  let processedData = priceEstimator.execute(vwaps);
-  console.log(vwaps);
-  console.log(processedData);
 }
 
 function startFetching(streamKey, interval) {

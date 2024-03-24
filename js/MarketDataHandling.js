@@ -1,7 +1,7 @@
 const ExchangeFactory = require("./exchanges/ExchangeFactory");
-const PriceEstimator = require("./utils/indicators/PriceEstimator");
 const Config = require("./utils/Config");
 const Redis = require("ioredis");
+const PriceEstimator = require("./utils/indicators/PriceEstimator");
 
 const pid = process.pid;
 const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
@@ -16,8 +16,9 @@ const {
   estimators,
 } = config.get("MarketDataHandling");
 
+let priceEstimator = new PriceEstimator(estimators)
 let exchange = ExchangeFactory.createExchange(exchangeName);
-let priceEstimator = new PriceEstimator(estimators);
+exchange.estimators = priceEstimator;
 let handler = exchange.getHandler(task);
 
 consumer.subscribe(source, (err, count) => {
@@ -32,11 +33,11 @@ consumer.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
     let handledData = handler(data);
-    let processedData = priceEstimator.execute(handledData);
-    let symbol =  processedData.symbol;
+    let symbol = handledData.symbol;
 
-    console.log(processedData);
-    producer.xadd(`${destination}.${symbol}` , "*", "data", JSON.stringify(processedData));
+    console.log(handledData)
+
+    producer.xadd(`${destination}.${symbol}` , "*", "data", JSON.stringify(handledData));
 
   } catch (error) {
     console.error("Error parsing JSON message:", error);

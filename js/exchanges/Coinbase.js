@@ -22,6 +22,15 @@ class Coinbase {
       "coinbase.futures.trades",
       this.handleFuturesTrades.bind(this)
     );
+
+    TaskManager.registerHandler(
+      "coinbase.spot.depth.estimators",
+      this.handleSpotDepthEstimators.bind(this)
+    );
+    TaskManager.registerHandler(
+      "coinbase.futures.depth.estimators",
+      this.handleFuturesDepthEstimators.bind(this)
+    );
   }
 
   getHandler(taskIdentifier) {
@@ -42,6 +51,18 @@ class Coinbase {
 
   handleFuturesTrades(data) {
     return data;
+  }
+
+  handleSpotDepthEstimators(data) {
+    const spotDepthData = this.handleSpotDepth(data);
+    const estimatorResults = this.estimators.execute(spotDepthData);
+    return { ...spotDepthData, ...estimatorResults };
+  }
+
+  handleFuturesDepthEstimators(data) {
+    const futuresDepthData = this.handleSpotDepth(data);
+    const estimatorResults = this.estimators.execute(futuresDepthData);
+    return { ...futuresDepthData, ...estimatorResults };
   }
 }
 
