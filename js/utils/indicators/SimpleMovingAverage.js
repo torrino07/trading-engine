@@ -1,6 +1,6 @@
 const BigNumber = require("bignumber.js");
 
-class Mean {
+class SMA {
   constructor(settings) {
     this.decimals = settings.decimals;
   }
@@ -10,9 +10,9 @@ class Mean {
       (acc, number) => acc.plus(new BigNumber(number)),
       new BigNumber(0)
     );
-    const mean = sum.dividedBy(data.length);
-    return mean.toFixed(this.decimals);
+    const sma = sum.dividedBy(data.length);
+    return sma.toFixed(this.decimals);
   }
 }
 
-module.exports = Mean;
+module.exports = SMA;

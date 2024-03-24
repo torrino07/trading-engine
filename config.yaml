@@ -24,12 +24,13 @@ MarketDataStatistics:
     - name: returns
       settings:
         decimals: 2
-    - name: mean
+    - name: sma
       settings:
         decimals: 2
-    # - name: ewma
-    #   settings:
-    #     lambda: 0.94
+    - name: ewma
+      settings:
+        lambda: 0.94
+        decimals: 2
     # - name: garch
     #   settings:
     #     alpha: 0.15
