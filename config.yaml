@@ -1,7 +1,7 @@
 MarketDataHandling:
   exchange: binance
   source: binance.spot.depth
-  destination: stream:binance.spot.depth
+  destination: binance.spot.depth
   task: binance.spot.depth.estimators
   estimators:
     - name: mid
@@ -16,10 +16,10 @@ MarketDataHandling:
         arrayLength: 5
 
 MarketDataStatistics:
-  sources: [stream:binance.spot.depth.BTCUSDT]
+  sources: binance.spot.depth.BTCUSDT
   destinations: indicators
   initialNumberOfEntries: 100
-  aggregationPeriod: 15000
+  aggregationPeriod: 10000
   estimators:
     - name: returns
       settings:

@@ -6,6 +6,7 @@ const redis = new Redis();
 const config = new Config();
 const { sources, initialNumberOfEntries, aggregationPeriod, estimators } =
   config.get("MarketDataStatistics");
+const [exchange, market, channel, symbol] = sources.split(".");
 
 let priceEstimator = new PriceEstimator(estimators);
 
@@ -36,19 +37,27 @@ async function fetchNewEntries(streamKey) {
       lastProcessedId = entries[entries.length - 1][0];
     }
   }
-
   return entries;
 }
 
 function processEntries(entries) {
   console.log(`Fetched ${entries.length} new entries:`);
-  const vwaps = entries
-    .map(([id, message]) => JSON.parse(message[1]))
-    .filter((data) => data.vwap)
-    .map((data) => data.vwap);
+  const dataArrays = entries.map(([id, message]) => JSON.parse(message[1]));
 
-    let data = priceEstimator.execute(vwaps)
-    console.log(data)
+  const [mids, vwaps] = dataArrays.reduce(
+    ([midsAcc, vwapsAcc], { mid, vwap }) => {
+      if (mid !== undefined) midsAcc.push(mid);
+      let estimatorsMid = priceEstimator.execute(midsAcc);
+      if (vwap !== undefined) vwapsAcc.push(vwap);
+      let estimatorsVwap = priceEstimator.execute(midsAcc);
+      return [midsAcc, vwapsAcc];
+    },
+    [[], []]
+  );
+
+  console.log({ exchange, market, channel, symbol, mids, vwaps });
+
+  // let data = priceEstimator.execute(data)
 }
 
 function startFetching(streamKey, interval) {
@@ -58,4 +67,4 @@ function startFetching(streamKey, interval) {
   }, interval);
 }
 
-startFetching(sources[0], aggregationPeriod);
+startFetching(sources, aggregationPeriod);

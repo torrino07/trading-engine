@@ -1,43 +1,77 @@
 class PriceEstimator {
   constructor(estimatorConfigs = []) {
-    this.estimatorFunctions = Array.isArray(estimatorConfigs)
-      ? this.composeEstimators(estimatorConfigs)
-      : [];
+    this.estimatorFunctions = this.composeEstimators(estimatorConfigs);
   }
 
   composeEstimators(estimatorConfigs) {
-    return estimatorConfigs.map((config) => {
-      return (data) => {
-        switch (config.name) {
-          case "mid":
-            return this.applyMid(data, config.settings);
-          case "vwap":
-            return this.applyVWAP(data, config.settings);
-          case "sma":
-            return this.applySMA(data, config.settings);
-          case "returns":
-            return this.applyReturns(data, config.settings);
-          case "ewma":
-            return this.applyEWMA(data, config.settings);
-          default:
-            console.warn(`Unsupported estimator: ${config.name}`);
-            return {};
-        }
-      };
-    });
+    // Helper function to get settings by name
+    const getSettings = (name) => {
+      return estimatorConfigs.find((config) => config.name === name)?.settings;
+    };
+
+    let hasMid = estimatorConfigs.some((config) => config.name === "mid");
+    let hasVwap = estimatorConfigs.some((config) => config.name === "vwap");
+    let hasSma = estimatorConfigs.some((config) => config.name === "sma");
+    let hasReturns = estimatorConfigs.some(
+      (config) => config.name === "returns"
+    );
+    let hasEwma = estimatorConfigs.some((config) => config.name === "ewma");
+
+    if (hasMid && hasVwap) {
+      return (data) =>
+        this.applyMidVWAP(data, getSettings("mid"), getSettings("vwap"));
+    }
+
+    if (hasReturns && hasSma && hasEwma) {
+      return (data) =>
+        this.applyReturnsSMAEWMA(
+          data,
+          getSettings("returns"),
+          getSettings("sma"),
+          getSettings("ewma")
+        );
+    } else if (hasReturns && hasSma) {
+      return (data) =>
+        this.applyReturnsSMA(data, getSettings("returns"), getSettings("sma"));
+    }
+
+    if (hasMid && !hasVwap) {
+      return (data) => this.applyMid(data, getSettings("mid"));
+    }
+
+    if (hasVwap && !hasMid) {
+      return (data) => this.applyVWAP(data, getSettings("vwap"));
+    }
+
+    if (hasSma && !hasReturns && !hasEwma) {
+      return (data) => this.applySMA(data, getSettings("sma"));
+    }
+
+    if (hasReturns && !hasSma && !hasEwma) {
+      return (data) => this.applyReturns(data, getSettings("returns"));
+    }
+
+    if (hasEwma && !hasReturns && !hasSma) {
+      return (data) => this.applyEWMA(data, getSettings("ewma"));
+    }
   }
 
   applyMid(data, settings) {
     const Mid = require("./MidPrice");
     const mid = new Mid(settings);
-    const midResult = mid.execute(data);
-    return { mid: midResult };
+    return { mid: mid.execute(data) };
   }
 
   applyVWAP(data, settings) {
     const VWAP = require("./VolumeWeightedAveragePrice");
     const vwap = new VWAP(settings);
     return { vwap: vwap.execute(data) };
+  }
+
+  applyMidVWAP(data, settingsMid, settingsVwap) {
+    const midResult = this.applyMid(data, settingsMid);
+    const vwapResult = this.applyVWAP(data, settingsVwap);
+    return { ...midResult, ...vwapResult };
   }
 
   applySMA(data, settings) {
@@ -58,16 +92,21 @@ class PriceEstimator {
     return { ewma: ewma.execute(data) };
   }
 
-  execute(data) {
-    const estimatorResults =
-      this.estimatorFunctions.length > 0
-        ? this.estimatorFunctions.reduce((acc, func) => {
-            const result = func(data);
-            return { ...acc, ...result };
-          }, {})
-        : {};
+  applyReturnsSMA(data, settingsReturns, settingsSma) {
+    const returnsResult = this.applyReturns(data, settingsReturns);
+    const smaResult = this.applySMA(data, settingsSma);
+    return { ...returnsResult, ...smaResult };
+  }
 
-    return estimatorResults;
+  applyReturnsSMAEWMA(data, settingsReturns, settingsSma, settingsEwma) {
+    const returnsResult = this.applyReturns(data, settingsReturns);
+    const smaResult = this.applySMA(data, settingsSma);
+    const ewmaResult = this.applyEWMA(data, settingsEwma);
+    return { ...returnsResult, ...smaResult, ...ewmaResult };
+  }
+
+  execute(data) {
+    return this.estimatorFunctions(data);
   }
 }
 
