@@ -1,7 +1,6 @@
 MarketDataHandling:
   exchange: binance
   source: binance.spot.depth
-  destination: binance.spot.depth
   task: binance.spot.depth.prices
   prices:
     - name: mid
@@ -17,7 +16,6 @@ MarketDataHandling:
 
 MarketDataStatistics:
   sources: binance.spot.depth.BTCUSDT
-  destination: binance.spot.depth.BTCUSDT.1m
   initialNumberOfEntries: 100
   aggregationPeriod: 1m
   signals:
@@ -34,6 +32,6 @@ MarketDataStatistics:
     
 TradingLogic:
   exchange: binance
-  source: [spot.trades, futures.trades, indicators]
-  destination: feedback
-  strategy: 
+  sources: [spot.trades, futures.trades, binance.spot.depth.BTCUSDT.1m]
+  settings:
+    strategy: dev

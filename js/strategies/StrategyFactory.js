@@ -14,6 +14,6 @@ class StrategyFactory {
         throw new Error("Invalid strategy");
     }
   }
-}
+};
 
 module.exports = StrategyFactory;

@@ -4,20 +4,20 @@ const Config = require("./utils/Config");
 const Redis = require("ioredis");
 
 const pid = process.pid;
+const parameters = new Redis({ host: "127.0.0.1", port: 6379 });
 const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
 
-let exchangeName = config.get("exchange");
-let source = config.get("source");
-let destination = config.get("destination");
+const { exchange: exchangeName, sources, settings} =
+  config.get("TradingLogic");
 
 let exchange = ExchangeFactory.createExchange(exchangeName);
-let strategy = StrategyFactory.createStrategy(config);
+let strategy = StrategyFactory.createStrategy(settings);
 
 // FIX SOURCE TO BE MULTIPLE OR ONE CHANNEL
-consumer.subscribe(source, (err, count) => {
+consumer.subscribe(sources, (err, count) => {
   if (err) {
     console.error("Failed to subscribe:", err.message);
     return;
@@ -36,19 +36,14 @@ consumer.on("message", (channel, message) => {
       strategy: strategy.name,
       message: strategy.message,
     };
-
-    producer.publish(destination, JSON.stringify(msg), (err, count) => {
-      if (err) {
-        console.error("Failed to produce message:", err.message);
-        return;
-      }
-    });
+    
   } catch (error) {
     console.error("Error parsing JSON message:", error);
   }
 });
 
 process.on("SIGINT", () => {
+  parameters.disconnect();
   consumer.disconnect();
   producer.disconnect();
   process.exit();
