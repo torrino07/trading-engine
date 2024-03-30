@@ -1,14 +1,18 @@
-const PriceEstimator = require("./utils/indicators/PriceEstimator");
+const SignalFactory = require("./utils/indicators/SignalFactory");
 const Config = require("./utils/Config");
+const TimeConverter = require("./utils/TimeConverter");
 const Redis = require("ioredis");
-const redis = new Redis();
+
+const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
+const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
-const { sources, initialNumberOfEntries, aggregationPeriod, estimators } =
+const { sources, initialNumberOfEntries, aggregationPeriod, signals } =
   config.get("MarketDataStatistics");
 const [exchange, market, channel, symbol] = sources.split(".");
 
-let priceEstimator = new PriceEstimator(estimators);
+const period = TimeConverter.minuteFormatToMillisecs(aggregationPeriod);
+let signalFactory = new SignalFactory(signals);
 
 let lastProcessedId = "0-0";
 let initializationDone = false;
@@ -17,7 +21,7 @@ async function fetchNewEntries(streamKey) {
   let entries = [];
 
   if (!initializationDone) {
-    entries = await redis.xrevrange(
+    entries = await consumer.xrevrange(
       streamKey,
       "+",
       "-",
@@ -31,7 +35,7 @@ async function fetchNewEntries(streamKey) {
     }
     initializationDone = true;
   } else {
-    entries = await redis.xrange(streamKey, lastProcessedId, "+");
+    entries = await consumer.xrange(streamKey, lastProcessedId, "+");
 
     if (entries.length > 0) {
       lastProcessedId = entries[entries.length - 1][0];
@@ -41,30 +45,52 @@ async function fetchNewEntries(streamKey) {
 }
 
 function processEntries(entries) {
-  console.log(`Fetched ${entries.length} new entries:`);
+  const timestamp = Date.now();
   const dataArrays = entries.map(([id, message]) => JSON.parse(message[1]));
 
-  const [mids, vwaps] = dataArrays.reduce(
-    ([midsAcc, vwapsAcc], { mid, vwap }) => {
-      if (mid !== undefined) midsAcc.push(mid);
-      let estimatorsMid = priceEstimator.execute(midsAcc);
-      if (vwap !== undefined) vwapsAcc.push(vwap);
-      let estimatorsVwap = priceEstimator.execute(midsAcc);
-      return [midsAcc, vwapsAcc];
+  const { mids, vwaps } = dataArrays.reduce(
+    (acc, entry) => {
+      if ("mid" in entry) {
+        acc.mids.push(entry.mid);
+      }
+      if ("vwap" in entry) {
+        acc.vwaps.push(entry.vwap);
+      }
+      return acc;
     },
-    [[], []]
+    { mids: [], vwaps: [] }
   );
 
-  console.log({ exchange, market, channel, symbol, mids, vwaps });
+  const result = {
+    exchange: exchange,
+    market: market,
+    channel: channel,
+    symbol: symbol,
+    timestamp: timestamp,
+  };
 
-  // let data = priceEstimator.execute(data)
+  if (mids.length > 0) {
+    result.mid = signalFactory.execute(mids);
+  }
+  if (vwaps.length > 0) {
+    result.vwap = signalFactory.execute(vwaps);
+  }
+
+  return result;
 }
 
 function startFetching(streamKey, interval) {
   setInterval(async () => {
     const entries = await fetchNewEntries(streamKey);
-    processEntries(entries);
+    const processedEntries = processEntries(entries);
+    producer.xadd(`${destination}` , "*", "data", JSON.stringify(processedEntries));
   }, interval);
 }
 
-startFetching(sources, aggregationPeriod);
+startFetching(sources, period);
+
+process.on("SIGINT", () => {
+  consumer.disconnect();
+  producer.disconnect();
+  process.exit();
+});

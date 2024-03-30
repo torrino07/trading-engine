@@ -1,7 +1,7 @@
 const ExchangeFactory = require("./exchanges/ExchangeFactory");
 const Config = require("./utils/Config");
 const Redis = require("ioredis");
-const PriceEstimator = require("./utils/indicators/PriceEstimator");
+const PriceFactory = require("./utils/indicators/PriceFactory");
 
 const pid = process.pid;
 const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
@@ -13,12 +13,12 @@ const {
   source,
   destination,
   task,
-  estimators,
+ prices,
 } = config.get("MarketDataHandling");
 
-let priceEstimator = new PriceEstimator(estimators)
+let priceFactory = new PriceFactory(prices)
 let exchange = ExchangeFactory.createExchange(exchangeName);
-exchange.estimators = priceEstimator;
+exchange.prices = priceFactory;
 let handler = exchange.getHandler(task);
 
 consumer.subscribe(source, (err, count) => {

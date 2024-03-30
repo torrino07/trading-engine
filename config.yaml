@@ -2,8 +2,8 @@ MarketDataHandling:
   exchange: binance
   source: binance.spot.depth
   destination: binance.spot.depth
-  task: binance.spot.depth.estimators
-  estimators:
+  task: binance.spot.depth.prices
+  prices:
     - name: mid
       settings:
         decimals: 2
@@ -11,16 +11,16 @@ MarketDataHandling:
     - name: vwap
       settings:
         decimals: 2
-        bidIndex: 5
+        bidIndex: 19
         askIndex: 0
-        arrayLength: 5
+        arrayLength: 19
 
 MarketDataStatistics:
   sources: binance.spot.depth.BTCUSDT
-  destinations: indicators
+  destination: binance.spot.depth.BTCUSDT.1m
   initialNumberOfEntries: 100
-  aggregationPeriod: 10000
-  estimators:
+  aggregationPeriod: 1m
+  signals:
     - name: returns
       settings:
         decimals: 2
@@ -31,10 +31,6 @@ MarketDataStatistics:
       settings:
         lambda: 0.94
         decimals: 2
-    # - name: garch
-    #   settings:
-    #     alpha: 0.15
-    #     beta: 0.8
     
 TradingLogic:
   exchange: binance

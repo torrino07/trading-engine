@@ -1,26 +1,18 @@
-class PriceEstimator {
-  constructor(estimatorConfigs = []) {
-    this.estimatorFunctions = this.composeEstimators(estimatorConfigs);
+class SignalFactory {
+  constructor(configs = []) {
+    this.signalFunctions = this.composeSignals(configs);
   }
 
-  composeEstimators(estimatorConfigs) {
-    // Helper function to get settings by name
+  composeSignals(configs) {
     const getSettings = (name) => {
-      return estimatorConfigs.find((config) => config.name === name)?.settings;
+      return configs.find((config) => config.name === name)?.settings;
     };
 
-    let hasMid = estimatorConfigs.some((config) => config.name === "mid");
-    let hasVwap = estimatorConfigs.some((config) => config.name === "vwap");
-    let hasSma = estimatorConfigs.some((config) => config.name === "sma");
-    let hasReturns = estimatorConfigs.some(
+    let hasSma = configs.some((config) => config.name === "sma");
+    let hasReturns = configs.some(
       (config) => config.name === "returns"
     );
-    let hasEwma = estimatorConfigs.some((config) => config.name === "ewma");
-
-    if (hasMid && hasVwap) {
-      return (data) =>
-        this.applyMidVWAP(data, getSettings("mid"), getSettings("vwap"));
-    }
+    let hasEwma = configs.some((config) => config.name === "ewma");
 
     if (hasReturns && hasSma && hasEwma) {
       return (data) =>
@@ -35,14 +27,6 @@ class PriceEstimator {
         this.applyReturnsSMA(data, getSettings("returns"), getSettings("sma"));
     }
 
-    if (hasMid && !hasVwap) {
-      return (data) => this.applyMid(data, getSettings("mid"));
-    }
-
-    if (hasVwap && !hasMid) {
-      return (data) => this.applyVWAP(data, getSettings("vwap"));
-    }
-
     if (hasSma && !hasReturns && !hasEwma) {
       return (data) => this.applySMA(data, getSettings("sma"));
     }
@@ -54,24 +38,6 @@ class PriceEstimator {
     if (hasEwma && !hasReturns && !hasSma) {
       return (data) => this.applyEWMA(data, getSettings("ewma"));
     }
-  }
-
-  applyMid(data, settings) {
-    const Mid = require("./MidPrice");
-    const mid = new Mid(settings);
-    return { mid: mid.execute(data) };
-  }
-
-  applyVWAP(data, settings) {
-    const VWAP = require("./VolumeWeightedAveragePrice");
-    const vwap = new VWAP(settings);
-    return { vwap: vwap.execute(data) };
-  }
-
-  applyMidVWAP(data, settingsMid, settingsVwap) {
-    const midResult = this.applyMid(data, settingsMid);
-    const vwapResult = this.applyVWAP(data, settingsVwap);
-    return { ...midResult, ...vwapResult };
   }
 
   applySMA(data, settings) {
@@ -106,8 +72,8 @@ class PriceEstimator {
   }
 
   execute(data) {
-    return this.estimatorFunctions(data);
+    return this.signalFunctions(data);
   }
 }
 
-module.exports = PriceEstimator;
+module.exports = SignalFactory;
