@@ -10,13 +10,11 @@ const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
 
-const { exchange: exchangeName, sources, settings} =
-  config.get("TradingLogic");
+const { exchange: exchangeName, sources, settings } = config.get("TradingLogic");
 
 let exchange = ExchangeFactory.createExchange(exchangeName);
 let strategy = StrategyFactory.createStrategy(settings);
 
-// FIX SOURCE TO BE MULTIPLE OR ONE CHANNEL
 consumer.subscribe(sources, (err, count) => {
   if (err) {
     console.error("Failed to subscribe:", err.message);
@@ -30,13 +28,12 @@ consumer.on("message", (channel, message) => {
     const data = JSON.parse(message);
     strategy.run(data);
 
-    let msg = {
+    producer.xadd(`TradingLogic.${pid}`, "*", "data", JSON.stringify({
       pid: pid,
       exchange: exchangeName,
-      strategy: strategy.name,
+      strategy: settings.strategy,
       message: strategy.message,
-    };
-    
+    }));
   } catch (error) {
     console.error("Error parsing JSON message:", error);
   }

@@ -9,12 +9,7 @@ const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
-const {
-  exchange: exchangeName,
-  source,
-  task,
-  prices,
-} = config.get("MarketDataHandling");
+const { exchange: exchangeName, source, task, prices } = config.get("MarketDataHandling");
 
 let priceFactory = new PriceFactory(prices)
 let exchange = ExchangeFactory.createExchange(exchangeName);

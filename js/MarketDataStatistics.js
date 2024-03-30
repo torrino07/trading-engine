@@ -9,11 +9,10 @@ const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
-const { sources, initialNumberOfEntries, aggregationPeriod, signals } =
-  config.get("MarketDataStatistics");
+const { sources, initialNumberOfEntries, aggregationPeriod, signals } = config.get("MarketDataStatistics");
 const [exchange, market, channel, symbol] = sources.split(".");
 
-let destination =  sources + "." + aggregationPeriod;
+let destination = sources + "." + aggregationPeriod;
 let period = TimeConverter.minuteFormatToMillisecs(aggregationPeriod);
 let signalFactory = new SignalFactory(signals);
 
@@ -27,11 +26,8 @@ parameters.on('message', (channel, message) => {
     if (params && params.signals && params.aggregationPeriod) {
       period = TimeConverter.minuteFormatToMillisecs(params.aggregationPeriod);
       console.log("New period set:", period);
-
       signalFactory = new SignalFactory(params.signals);
-
       startFetching(sources, period);
-
       console.log("Updated signals configuration:", params);
     }
   } catch (error) {
@@ -47,13 +43,7 @@ async function fetchNewEntries(streamKey) {
   let entries = [];
 
   if (!initializationDone) {
-    entries = await consumer.xrevrange(
-      streamKey,
-      "+",
-      "-",
-      "COUNT",
-      initialNumberOfEntries
-    );
+    entries = await consumer.xrevrange(streamKey, "+", "-", "COUNT", initialNumberOfEntries);
     entries = entries.reverse();
 
     if (entries.length > 0) {
@@ -101,7 +91,6 @@ function processEntries(entries) {
   if (vwaps.length > 0) {
     result.vwap = signalFactory.execute(vwaps);
   }
-
   return result;
 }
 
