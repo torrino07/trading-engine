@@ -24,6 +24,7 @@ parameters.on('message', (channel, message) => {
   try {
     const params = JSON.parse(message);
     if (params && params.signals && params.aggregationPeriod) {
+      destination = sources + "." + params.aggregationPeriod;
       period = TimeConverter.minuteFormatToMillisecs(params.aggregationPeriod);
       console.log("New period set:", period);
       signalFactory = new SignalFactory(params.signals);

@@ -25,9 +25,13 @@ MarketDataStatistics:
     - name: sma
       settings:
         decimals: 2
-    - name: ewma
+    - name: ewma-slow
       settings:
-        lambda: 0.94
+        lambda: 0.035
+        decimals: 2
+    - name: ewma-fast
+      settings:
+        lambda: 0.90
         decimals: 2
     
 TradingLogic:

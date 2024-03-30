@@ -12,31 +12,33 @@ class SignalFactory {
     let hasReturns = configs.some(
       (config) => config.name === "returns"
     );
-    let hasEwma = configs.some((config) => config.name === "ewma");
+    let hasEwmaSlow = configs.some((config) => config.name === "ewma-slow");
+    let hasEwmaFast = configs.some((config) => config.name === "ewma-fast");
 
-    if (hasReturns && hasSma && hasEwma) {
+    if (hasReturns && hasSma && hasEwmaSlow && hasEwmaFast) {
       return (data) =>
         this.applyReturnsSMAEWMA(
           data,
           getSettings("returns"),
           getSettings("sma"),
-          getSettings("ewma")
+          getSettings("ewma-slow"),
+          getSettings("ewma-fast")
         );
     } else if (hasReturns && hasSma) {
       return (data) =>
         this.applyReturnsSMA(data, getSettings("returns"), getSettings("sma"));
     }
 
-    if (hasSma && !hasReturns && !hasEwma) {
+    if (hasSma && !hasReturns && !hasEwmaSlow && !hasEwmaFast) {
       return (data) => this.applySMA(data, getSettings("sma"));
     }
 
-    if (hasReturns && !hasSma && !hasEwma) {
+    if (hasReturns && !hasSma && !hasEwmaSlow && !hasEwmaFast) {
       return (data) => this.applyReturns(data, getSettings("returns"));
     }
 
-    if (hasEwma && !hasReturns && !hasSma) {
-      return (data) => this.applyEWMA(data, getSettings("ewma"));
+    if (hasEwmaSlow && hasEwmaFast && !hasReturns && !hasSma) {
+      return (data) => this.applyEWMA(data, getSettings("ewma-slow"), getSettings("ewma-fast"));
     }
   }
 
@@ -52,10 +54,11 @@ class SignalFactory {
     return { returns: returns.execute(data) };
   }
 
-  applyEWMA(data, settings) {
+  applyEWMA(data, settingsEwmaSlow, settingsEwmaFast) {
     const EWMA = require("./ExponentialWeightedMovingAverage");
-    const ewma = new EWMA(settings);
-    return { ewma: ewma.execute(data) };
+    const ewmaSlow = new EWMA(settingsEwmaSlow);
+    const ewmaFast = new EWMA(settingsEwmaFast);
+    return { "ewma-slow": ewmaSlow.execute(data), "ewma-fast": ewmaFast.execute(data),};
   }
 
   applyReturnsSMA(data, settingsReturns, settingsSma) {
@@ -64,11 +67,11 @@ class SignalFactory {
     return { ...returnsResult, ...smaResult };
   }
 
-  applyReturnsSMAEWMA(data, settingsReturns, settingsSma, settingsEwma) {
+  applyReturnsSMAEWMA(data, settingsReturns, settingsSma, settingsEwmaSlow, settingsEwmaFast) {
     const returnsResult = this.applyReturns(data, settingsReturns);
     const smaResult = this.applySMA(data, settingsSma);
-    const ewmaResult = this.applyEWMA(data, settingsEwma);
-    return { ...returnsResult, ...smaResult, ...ewmaResult };
+    const ewmaResult = this.applyEWMA(data, settingsEwmaSlow, settingsEwmaFast);
+    return { ...returnsResult, ...smaResult, ...ewmaResult};
   }
 
   execute(data) {
