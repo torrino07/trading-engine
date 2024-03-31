@@ -42,7 +42,7 @@ consumer.on("message", (channel, message) => {
     const data = JSON.parse(message);
     strategy.run(data);
 
-    producer.xadd(`TradingLogic.${pid}`, "*", "data", JSON.stringify({
+    producer.xadd(`TradingLogic`, "*", "data", JSON.stringify({
       pid: pid,
       exchange: exchangeName,
       strategy: settings.strategy,

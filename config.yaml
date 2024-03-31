@@ -10,9 +10,9 @@ MarketDataHandling:
     - name: vwap
       settings:
         decimals: 2
-        bidIndex: 19
+        bidIndex: 5
         askIndex: 0
-        arrayLength: 19
+        arrayLength: 5
 
 MarketDataStatistics:
   sources: binance.spot.depth.BTCUSDT
