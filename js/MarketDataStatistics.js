@@ -12,7 +12,6 @@ const config = new Config();
 const { sources, initialNumberOfEntries, aggregationPeriod, signals } = config.get("MarketDataStatistics");
 const [exchange, market, channel, symbol] = sources.split(".");
 
-let destination = sources + "." + aggregationPeriod;
 let period = TimeConverter.minuteFormatToMillisecs(aggregationPeriod);
 let signalFactory = new SignalFactory(signals);
 
@@ -23,12 +22,8 @@ parameters.subscribe(`parameters.`, (err, count) => {
 parameters.on('message', (channel, message) => {
   try {
     const params = JSON.parse(message);
-    if (params && params.signals && params.aggregationPeriod) {
-      destination = sources + "." + params.aggregationPeriod;
-      period = TimeConverter.minuteFormatToMillisecs(params.aggregationPeriod);
-      console.log("New period set:", period);
+    if (params && params.signals) {
       signalFactory = new SignalFactory(params.signals);
-      startFetching(sources, period);
       console.log("Updated signals configuration:", params);
     }
   } catch (error) {
@@ -36,7 +31,6 @@ parameters.on('message', (channel, message) => {
   }
 });
 
-let fetchIntervalId;
 let lastProcessedId = "0-0";
 let initializationDone = false;
 
@@ -96,15 +90,11 @@ function processEntries(entries) {
 }
 
 function startFetching(streamKey, interval) {
-  if (fetchIntervalId) {
-    clearInterval(fetchIntervalId);
-  }
-
-  fetchIntervalId = setInterval(async () => {
+  setInterval(async () => {
     const entries = await fetchNewEntries(streamKey);
     const processedEntries = processEntries(entries);
     console.log(processedEntries);
-    producer.xadd(`${destination}`, "*", "data", JSON.stringify(processedEntries));
+    producer.xadd(sources + "." + aggregationPeriod, "*", "data", JSON.stringify(processedEntries));
   }, interval);
 }
 

@@ -2,7 +2,6 @@ const TaskManager = require("../utils/TaskManager");
 
 class Binance {
   constructor() {
-    this.registerTask();
   }
 
   registerTask() {

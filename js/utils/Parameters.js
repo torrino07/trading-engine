@@ -14,7 +14,7 @@ const newParameters = {
       {
         name: "vwap",
         settings: {
-          bidIndex: 29999,
+          bidIndex: 12,
           askIndex: 0,
           arrayLength: 12
         }

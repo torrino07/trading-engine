@@ -35,7 +35,7 @@ MarketDataStatistics:
         decimals: 2
     
 TradingLogic:
-  exchange: binance
   sources: [spot.trades, futures.trades, binance.spot.depth.BTCUSDT.1m]
   settings:
+    exchange: binance
     strategy: dev

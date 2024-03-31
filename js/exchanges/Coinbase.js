@@ -2,7 +2,6 @@ const TaskManager = require("../utils/TaskManager");
 
 class Coinbase {
   constructor() {
-    this.registerTask();
   }
 
   registerTask() {
@@ -22,7 +21,6 @@ class Coinbase {
       "coinbase.futures.trades",
       this.handleFuturesTrades.bind(this)
     );
-
     TaskManager.registerHandler(
       "coinbase.spot.depth.prices",
       this.handleSpotDepthPrices.bind(this)

@@ -13,6 +13,7 @@ const { exchange: exchangeName, source, task, prices } = config.get("MarketDataH
 
 let priceFactory = new PriceFactory(prices)
 let exchange = ExchangeFactory.createExchange(exchangeName);
+exchange.registerTask();
 exchange.prices = priceFactory;
 let handler = exchange.getHandler(task);
 
@@ -46,12 +47,8 @@ consumer.on("message", (channel, message) => {
     const data = JSON.parse(message);
     let handledData = handler(data);
     let symbol = handledData.symbol;
-    let destination = source + "." + symbol
-
     console.log(handledData)
-
-    producer.xadd(destination, "*", "data", JSON.stringify(handledData));
-
+    producer.xadd(source + "." + symbol, "*", "data", JSON.stringify(handledData));
   } catch (error) {
     console.error("Error parsing JSON message:", error);
   }

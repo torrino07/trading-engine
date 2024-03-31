@@ -1,4 +1,3 @@
-const ExchangeFactory = require("./exchanges/ExchangeFactory");
 const StrategyFactory = require("./strategies/StrategyFactory");
 const Config = require("./utils/Config");
 const Redis = require("ioredis");
@@ -10,10 +9,25 @@ const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
 
-const { exchange: exchangeName, sources, settings } = config.get("TradingLogic");
+const { sources, settings } = config.get("TradingLogic");
 
-let exchange = ExchangeFactory.createExchange(exchangeName);
 let strategy = StrategyFactory.createStrategy(settings);
+
+parameters.subscribe(`parameters.`, (err, count) => {
+  console.log(`Listening for market parameter updates on ${count} channel(s).`);
+});
+
+parameters.on('message', (channel, message) => {
+  try {
+    const params = JSON.parse(message);
+    if (params && params.settings) {
+      strategy = StrategyFactory.createStrategy(params.settings);
+      console.log("Updated parameter settings:", params.settings);
+    }
+  } catch (error) {
+    console.error("Error parsing or applying new parameters:", error);
+  }
+});
 
 consumer.subscribe(sources, (err, count) => {
   if (err) {
