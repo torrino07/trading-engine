@@ -4,35 +4,25 @@ class Coinbase {
   constructor() {
   }
 
-  registerTask() {
-    TaskManager.registerHandler(
-      "coinbase.spot.depth",
-      this.handleSpotDepth.bind(this)
-    );
-    TaskManager.registerHandler(
-      "coinbase.spot.trades",
-      this.handleSpotTrades.bind(this)
-    );
-    TaskManager.registerHandler(
-      "coinbase.futures.depth",
-      this.handleFuturesDepth.bind(this)
-    );
-    TaskManager.registerHandler(
-      "coinbase.futures.trades",
-      this.handleFuturesTrades.bind(this)
-    );
-    TaskManager.registerHandler(
-      "coinbase.spot.depth.prices",
-      this.handleSpotDepthPrices.bind(this)
-    );
-    TaskManager.registerHandler(
-      "coinbase.futures.depth.prices",
-      this.handleFuturesDepthPrices.bind(this)
-    );
+  registerTask(task) {
+    const handlers = {
+      "coinbase.spot.depth": this.handleSpotDepth,
+      "coinbase.spot.trades": this.handleSpotTrades,
+      "coinbase.futures.depth": this.handleFuturesDepth,
+      "coinbase.futures.trades": this.handleFuturesTrades,
+      "coinbase.spot.depth.prices": this.handleSpotDepthPrices,
+      "coinbase.futures.depth.prices": this.handleFuturesDepthPrices
+    }
+
+    if (handlers[task]) {
+      TaskManager.registerHandler(task, handlers[task].bind(this));
+    } else {
+      console.log(`Handler for ${task} not found.`);
+    }
   }
 
-  getHandler(taskIdentifier) {
-    return TaskManager.getHandler(taskIdentifier);
+  getHandler(task) {
+    return TaskManager.getHandler(task);
   }
 
   handleSpotDepth(data) {

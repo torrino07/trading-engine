@@ -1,7 +1,7 @@
+const PriceFactory = require("./utils/indicators/PriceFactory");
 const ExchangeFactory = require("./exchanges/ExchangeFactory");
 const Config = require("./utils/Config");
 const Redis = require("ioredis");
-const PriceFactory = require("./utils/indicators/PriceFactory");
 
 const pid = process.pid;
 const parameters = new Redis({ host: "127.0.0.1", port: 6379 });
@@ -11,10 +11,9 @@ const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 const config = new Config();
 const { exchange: exchangeName, source, task, prices } = config.get("MarketDataHandling");
 
-let priceFactory = new PriceFactory(prices)
-let exchange = ExchangeFactory.createExchange(exchangeName);
-exchange.registerTask();
-exchange.prices = priceFactory;
+let exchange  = ExchangeFactory.createExchange(exchangeName);
+exchange.registerTask(task);
+exchange.prices = new PriceFactory(prices);
 let handler = exchange.getHandler(task);
 
 parameters.subscribe(`parameters.${pid}`, (err, count) => {
@@ -25,8 +24,7 @@ parameters.on('message', (channel, message) => {
   try {
     const params = JSON.parse(message);
     if (params && params.prices) {
-      priceFactory = new PriceFactory(params.prices);
-      exchange.prices = priceFactory;
+      exchange.prices = new PriceFactory(params.prices);
       console.log("Updated prices configuration:", params.prices);
     }
   } catch (error) {
@@ -47,7 +45,7 @@ consumer.on("message", (channel, message) => {
     const data = JSON.parse(message);
     let handledData = handler(data);
     let symbol = handledData.symbol;
-    console.log(handledData)
+    console.log(handledData);
     producer.xadd(source + "." + symbol, "*", "data", JSON.stringify(handledData));
   } catch (error) {
     console.error("Error parsing JSON message:", error);

@@ -4,35 +4,25 @@ class Binance {
   constructor() {
   }
 
-  registerTask() {
-    TaskManager.registerHandler(
-      "binance.spot.depth",
-      this.handleSpotDepth.bind(this)
-    );
-    TaskManager.registerHandler(
-      "binance.spot.trades",
-      this.handleSpotTrades.bind(this)
-    );
-    TaskManager.registerHandler(
-      "binance.futures.depth",
-      this.handleFuturesDepth.bind(this)
-    );
-    TaskManager.registerHandler(
-      "binance.futures.trades",
-      this.handleFuturesTrades.bind(this)
-    );
-    TaskManager.registerHandler(
-      "binance.spot.depth.prices",
-      this.handleSpotDepthPrices.bind(this)
-    );
-    TaskManager.registerHandler(
-      "binance.futures.depth.prices",
-      this.handleFuturesDepthPrices.bind(this)
-    );
+  registerTask(task) {
+    const handlers = {
+      "binance.spot.depth": this.handleSpotDepth,
+      "binance.spot.trades": this.handleSpotTrades,
+      "binance.futures.depth": this.handleFuturesDepth,
+      "binance.futures.trades": this.handleFuturesTrades,
+      "binance.spot.depth.prices": this.handleSpotDepthPrices,
+      "binance.futures.depth.prices": this.handleFuturesDepthPrices
+    }
+
+    if (handlers[task]) {
+      TaskManager.registerHandler(task, handlers[task].bind(this));
+    } else {
+      console.log(`Handler for ${task} not found.`);
+    }
   }
 
-  getHandler(taskIdentifier) {
-    return TaskManager.getHandler(taskIdentifier);
+  getHandler(task) {
+    return TaskManager.getHandler(task);
   }
 
   handleSpotDepth(data) {
