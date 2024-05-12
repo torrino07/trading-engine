@@ -1,7 +1,7 @@
 MarketDataHandling:
   exchange: binance
   source: binance.spot.depth
-  task: binance.spot.depth.prices
+  task: binance.spot.depth
   prices:
     - name: mid
       settings:
