@@ -43,6 +43,7 @@ consumer.subscribe(source, (err, count) => {
 consumer.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
+    console.log(data)
     let handledData = handler(data);
     let symbol = handledData.symbol;
     console.log(handledData);
