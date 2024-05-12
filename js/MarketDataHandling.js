@@ -20,7 +20,7 @@ parameters.subscribe(`parameters.${pid}`, (err, count) => {
   console.log(`Listening for market parameter updates on ${count} channel(s).`);
 });
 
-parameters.on('message', (channel, message) => {
+parameters.on("message", (channel, message) => {
   try {
     const params = JSON.parse(message);
     if (params && params.prices) {
@@ -43,7 +43,6 @@ consumer.subscribe(source, (err, count) => {
 consumer.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
-    console.log(data)
     let handledData = handler(data);
     let symbol = handledData.symbol;
     console.log(handledData);
