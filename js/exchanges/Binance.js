@@ -47,9 +47,10 @@ class Binance {
     const symbol = response.s;
     const price = response.p;
     const volume = response.q;
-    const timestamp = response.T;
+    const exchange_timestamp = response.T;
+    const timestamp = Date.now();
 
-    return { exchange, market, channel, symbol, price, volume, timestamp };
+    return { exchange, market, channel, symbol, price, volume, exchange_timestamp, timestamp };
   }
 
   handleFuturesDepth(data) {
