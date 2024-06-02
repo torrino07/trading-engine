@@ -11,7 +11,9 @@ class Binance {
       "binance.futures.depth": this.handleFuturesDepth,
       "binance.futures.trades": this.handleFuturesTrades,
       "binance.spot.depth.prices": this.handleSpotDepthPrices,
-      "binance.futures.depth.prices": this.handleFuturesDepthPrices
+      "binance.futures.depth.prices": this.handleFuturesDepthPrices,
+      "binance.spot.raw": this.handleSpotRaw,
+      "binance.futures.raw": this.handleFuturesRaw
     }
 
     if (handlers[task]) {
@@ -47,10 +49,10 @@ class Binance {
     const symbol = response.s;
     const price = response.p;
     const volume = response.q;
-    const exchange_timestamp = response.T;
     const timestamp = Date.now();
+    const isBuyerMaker = response.m;
 
-    return { exchange, market, channel, symbol, price, volume, exchange_timestamp, timestamp };
+    return { exchange, market, channel, symbol, price, volume, isBuyerMaker, timestamp };
   }
 
   handleFuturesDepth(data) {
@@ -75,8 +77,19 @@ class Binance {
     const price = response.p;
     const volume = response.q;
     const timestamp = response.T;
+    const isBuyerMaker = response.m;
 
-    return { exchange, market, channel, symbol, price, volume, timestamp };
+    return { exchange, market, channel, symbol, price, volume, isBuyerMaker, timestamp };
+  }
+
+  handleSpotRaw(data) {
+    const timestamp = Date.now();
+    return { data, timestamp }
+  }
+
+  handleFuturesRaw(data) {
+    const timestamp = Date.now();
+    return { data, timestamp }
   }
 
   handleSpotDepthPrices(data) {
