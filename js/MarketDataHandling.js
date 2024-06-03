@@ -45,7 +45,7 @@ consumer.on("message", (channel, message) => {
     const data = JSON.parse(message);
     let handledData = handler(data);
     console.log(handledData);
-    //producer.xadd(source + "." + symbol, "*", "data", JSON.stringify(handledData));
+    producer.xadd(source + "." + symbol, "*", "data", JSON.stringify(handledData));
   } catch (error) {
     console.error("Error parsing JSON message:", error);
   }
