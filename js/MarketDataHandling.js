@@ -9,7 +9,7 @@ const consumer = new Redis({ host: "127.0.0.1", port: 6379 });
 const producer = new Redis({ host: "127.0.0.1", port: 6379 });
 
 const config = new Config();
-const { exchange: exchangeName, source, task, prices } = config.get("MarketDataHandling");
+const { exchange: exchangeName, symbol, source, task, prices } = config.get("MarketDataHandling");
 
 let exchange  = ExchangeFactory.createExchange(exchangeName);
 exchange.registerTask(task);
@@ -44,9 +44,8 @@ consumer.on("message", (channel, message) => {
   try {
     const data = JSON.parse(message);
     let handledData = handler(data);
-    let symbol = handledData.symbol;
     console.log(handledData);
-    producer.xadd(source + "." + symbol, "*", "data", JSON.stringify(handledData));
+    //producer.xadd(source + "." + symbol, "*", "data", JSON.stringify(handledData));
   } catch (error) {
     console.error("Error parsing JSON message:", error);
   }

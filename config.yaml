@@ -1,7 +1,8 @@
 MarketDataHandling:
   exchange: binance
-  source: binance.spot.raw
-  task: binance.spot.raw
+  symbol: BTCUSDT
+  source: binance.futures.raw
+  task: binance.futures.raw
   prices:
     - name: mid
       settings:

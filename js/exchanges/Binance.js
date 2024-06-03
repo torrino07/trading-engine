@@ -83,13 +83,11 @@ class Binance {
   }
 
   handleSpotRaw(data) {
-    const timestamp = Date.now();
-    return { data, timestamp }
+    return data
   }
 
   handleFuturesRaw(data) {
-    const timestamp = Date.now();
-    return { data, timestamp }
+    return data
   }
 
   handleSpotDepthPrices(data) {
