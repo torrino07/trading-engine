@@ -47,6 +47,6 @@
 
 
 node MarketDataHandling.js binance futures raw
-node MarketDataStore.js
 node TradingLogic.js binance futures parsed
+node MarketDataStore.js
 node ArchiveCleanLogs.js us-east-1 marketdata001-dev

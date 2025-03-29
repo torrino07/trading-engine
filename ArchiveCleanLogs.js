@@ -29,7 +29,7 @@ async function archiveAndCleanLogs() {
       await s3
         .putObject({
           Bucket: bucketName,
-          Key: `${file}`,
+          Key: `logs/${file}`,
           Body: fileContent,
         })
         .promise();

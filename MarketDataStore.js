@@ -1,7 +1,5 @@
 const { createLogStream } = require("./utils/createLogStream")
 const zmq = require("zeromq");
-const fs = require("fs");
-const path = require("path");
 const { Buffer } = require("buffer");
 
 async function runClient() {
