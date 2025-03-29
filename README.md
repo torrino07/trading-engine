@@ -44,3 +44,8 @@
 - Introduction to Linear Algebra: https://amzn.to/3qXc47m
 - Advances in Active Portfolio Management: https://amzn.to/3xwSfpX
 - Technical Analysis is Mostly Bullshit: https://amzn.to/2TU3M41
+
+
+node MarketDataHandling.js binance futures raw
+node MarketDataStore.js
+node TradingLogic.js binance futures parsed

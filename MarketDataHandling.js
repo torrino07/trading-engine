@@ -1,0 +1,47 @@
+const zmq = require("zeromq");
+
+if (process.argv.length < 5) {
+  console.error("Please provide exchange, market, and source as arguments.");
+  process.exit(1);
+}
+
+let exchange = process.argv[2];
+let market = process.argv[3];
+let source = process.argv[4];
+
+async function runClient() {
+  const { handleResponse } = require(`./exchanges/${exchange}`);
+  const subscriberSock = new zmq.Subscriber();
+  const publisherSock = new zmq.Publisher();
+
+  subscriberSock.connect(`tcp://127.0.0.1:5555`);
+  subscriberSock.subscribe(`${exchange}.${market}.${source}`);
+
+  await publisherSock.bind(`tcp://127.0.0.1:5556`);
+
+  async function sendMessage(message) {
+    try {
+      await publisherSock.send(message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  }
+
+  try {
+    for await (const [topic, message] of subscriberSock) {
+      const response = JSON.parse(message);
+      const parsedData = handleResponse(response, exchange);
+
+      const messageToSend = [
+        `${exchange}.${market}.parsed`,
+        JSON.stringify(parsedData),
+      ];
+
+      await sendMessage(messageToSend);
+    }
+  } catch (error) {
+    console.error("Error parsing new topic:", error);
+  }
+}
+
+runClient();
