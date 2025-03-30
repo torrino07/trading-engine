@@ -1,43 +1,39 @@
-let latestTrade = null;
-let latestOrderbook = null;
+let latestTrade = {};
+let latestOrderbook = {};
 
 function handleResponse(response, exchange) {
   const data = response.data;
-  if (data.e === "aggTrade") {
-    handleAggTrade(data);
-  } else if (data.e === "depthUpdate") {
-    handleDepthUpdate(data);
+  const stream = response.stream
+  if (data.e === "trade") {
+    handleTrade(data);
+  } else if (stream) {
+    handleDepthUpdate(data, stream);
   }
-
   return { exchange, trade: latestTrade, orderbook: latestOrderbook };
 }
 
-function handleAggTrade(data) {
-  latestTrade = {
+function handleTrade(data) {
+  latestTrade[data.s] = {
     eventType: data.e,
     eventTime: data.E,
-    tradeId: data.a,
+    tradeId: data.t,
     symbol: data.s,
     price: data.p,
     quantity: data.q,
-    firstTradeId: data.f,
-    lastTradeId: data.l,
     tradeTime: data.T,
     isBuyerMaker: data.m,
   };
 }
 
-function handleDepthUpdate(data) {
-  latestOrderbook = {
-    eventType: data.e,
-    eventTime: data.E,
-    symbol: data.s,
-    firstUpdateId: data.U,
-    finalUpdateId: data.u,
-    previousUpdateId: data.pu,
-    bids: data.b,
-    asks: data.a,
+function handleDepthUpdate(data, stream) {
+  latestOrderbook[handleStream(stream)] = {
+    lastUpdateId: data.lastUpdateId,
+    bids: data.bids,
+    asks: data.asks,
   };
 }
 
+function handleStream(stream){
+  return stream.split("@")[0].toUpperCase()
+}
 module.exports = { handleResponse };

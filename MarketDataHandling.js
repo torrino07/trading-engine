@@ -31,7 +31,7 @@ async function runClient() {
     for await (const [topic, message] of subscriberSock) {
       const response = JSON.parse(message);
       const parsedData = handleResponse(response, exchange);
-
+      
       const messageToSend = [
         `${exchange}.${market}.parsed`,
         JSON.stringify(parsedData),
