@@ -46,7 +46,12 @@
 - Technical Analysis is Mostly Bullshit: https://amzn.to/2TU3M41
 
 
-node MarketDataHandling.js binance futures raw
+node MarketDataHandling.js binance spot raw
 node MarketDataStore.js
-node TradingLogic.js binance futures parsed
+node TradingLogic.js binance spot parsed
 node ArchiveCleanLogs.js us-east-1 marketdata001-dev
+
+
+do a few more exchanges spot. coinbase (5 goods and 5 shitty)
+
+https://rust-hdl.org/
