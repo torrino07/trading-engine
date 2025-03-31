@@ -1,18 +1,20 @@
 let latestTrade = {};
 let latestOrderbook = {};
+let market = "spot"
+let exchange = "binance"
 
-function handleResponse(response, exchange, market) {
+function handleResponse(response) {
   const data = response.data;
   const stream = response.stream
   if (data.e === "trade") {
-    handleSpotTrade(data);
+    handleTrade(data);
   } else if (stream) {
-    handleSpotDepthUpdate(data, stream);
+    handleDepthUpdate(data, stream);
   }
   return { exchange, market, trade: latestTrade, orderbook: latestOrderbook };
 }
 
-function handleSpotTrade(data) {
+function handleTrade(data) {
   latestTrade[data.s] = {
     eventType: data.e,
     eventTime: data.E,
@@ -25,7 +27,7 @@ function handleSpotTrade(data) {
   };
 }
 
-function handleSpotDepthUpdate(data, stream) {
+function handleDepthUpdate(data, stream) {
   latestOrderbook[handleStream(stream)] = {
     lastUpdateId: data.lastUpdateId,
     bids: data.bids,

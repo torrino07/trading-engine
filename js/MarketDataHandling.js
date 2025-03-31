@@ -10,7 +10,7 @@ let market = process.argv[3];
 let source = process.argv[4];
 
 async function runClient() {
-  const { handleResponse } = require(`./utils/${exchange}`);
+  const { handleResponse } = require(`./utils/exchanges/${exchange}/${market}`);
   const subscriberSock = new zmq.Subscriber();
   const publisherSock = new zmq.Publisher();
 
