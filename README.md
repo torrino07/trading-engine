@@ -55,3 +55,9 @@ node ArchiveCleanLogs.js us-east-1 marketdata001-dev
 do a few more exchanges spot. coinbase (5 goods and 5 shitty)
 
 https://rust-hdl.org/
+
+
+cargo new project_name
+cd project_name
+cargo build
+cargo run
