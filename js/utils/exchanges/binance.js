@@ -10,7 +10,7 @@ function handleResponse(response) {
   if (channel == "trade") {
     handleSpotTrade(data);
     return { exchange: exchange, market, symbol, trades };
-  } else if (channel.includes("depth")) {
+  } else if (channel.startsWith("depth")) {
     handleSpotDepth(data);
     return { exchange: exchange, market, symbol, orderbook };
   } else {
@@ -39,18 +39,12 @@ function handleSpotDepth(data) {
   };
 }
 
-function handleFuturesTrade(data) {
-  return {};
-}
-
-function handleFuturesDepth(data) {
-  return {};
-}
-
 function handleStream(stream) {
-  const streamArray = stream.split("@");
-  const symbol = streamArray[0].toUpperCase();
-  const channel = streamArray[1];
+  const atPos = stream.indexOf("@");
+  if (atPos < 0) return null;
+  const symbol = stream.substring(0, atPos).toUpperCase();
+  const channel = stream.substring(atPos + 1);
+
   return { symbol, channel };
 }
 
