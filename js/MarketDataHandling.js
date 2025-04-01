@@ -5,11 +5,11 @@ if (process.argv.length < 4) {
   process.exit(1);
 }
 
+let exchange = process.argv[2];
+let market = process.argv[3];
+
 async function main() {
-
-  let exchange = process.argv[2];
-  let market = process.argv[3];
-
+  
   const { handleResponse } = require(`./utils/exchanges/${exchange}`);
 
   const subscriberSock = new zmq.Subscriber();
