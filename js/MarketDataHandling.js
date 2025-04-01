@@ -34,12 +34,12 @@ async function main() {
       const parsedData = handleResponse(response);
       console.log(parsedData)
 
-      // const messageToSend = [
-      //   `${exchange}.${market}.parsed`,
-      //   JSON.stringify(parsedData),
-      // ];
+      const messageToSend = [
+        `${exchange}.${market}.parsed`,
+        JSON.stringify(parsedData),
+      ];
 
-      // await sendMessage(messageToSend);
+      await sendMessage(messageToSend);
     }
   } catch (error) {
     console.error("Error parsing new topic:", error);
