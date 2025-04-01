@@ -46,7 +46,7 @@
 - Technical Analysis is Mostly Bullshit: https://amzn.to/2TU3M41
 
 
-node MarketDataHandling.js binance spot raw
+node MarketDataHandling.js binance spot
 node MarketDataStore.js
 node TradingLogic.js binance spot parsed
 node ArchiveCleanLogs.js us-east-1 marketdata001-dev
@@ -61,3 +61,10 @@ cargo new project_name
 cd project_name
 cargo build
 cargo run
+
+cargo run -- binance spot raw
+
+
+
+we need to give more information from the payload in cpp
+exchange and market
