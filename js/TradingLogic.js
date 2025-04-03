@@ -1,22 +1,18 @@
-const zmq = require("zeromq");
+const zmq = require("zeromq")
 
-if (process.argv.length < 5) {
-  console.error("Please provide a channel name as an argument.");
-  process.exit(1);
-}
+async function main() {
+  const [portsArg, topicsArg] = process.argv.slice(2);
 
-let exchange = process.argv[2];
-let market = process.argv[3];
-let source = process.argv[4];
+  const ports = portsArg.includes(",") ? portsArg.split(",") : [portsArg];
+  const topics = topicsArg.includes(",") ? topicsArg.split(",") : [topicsArg];
+  
+  const sock = new zmq.Subscriber();
 
-async function runClient() {
-  const subscriberSock = new zmq.Subscriber();
-
-  subscriberSock.connect(`tcp://127.0.0.1:5557`);
-  subscriberSock.subscribe(`${exchange}.${market}.${source}`);
+  topics.forEach(topic => sock.subscribe(`processed.${topic}`));
+  ports.forEach(port => sock.connect(`tcp://127.0.0.1:${port}`));
 
   try {
-    for await (const [topic, message] of subscriberSock) {
+    for await (const [topic, message] of sock) {
       const response = JSON.parse(message);
       console.log(response)
 
@@ -26,4 +22,4 @@ async function runClient() {
   }
 }
 
-runClient();
+main();

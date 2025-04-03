@@ -1,27 +1,34 @@
-let orderbook = {};
-let trades = {};
-
 function handleResponse(response) {
   const { exchange, market, payload } = response;
-  const data = payload.data;
-  const stream = payload.stream;
-  const { symbol, channel } = handleStream(stream);
+  const { data, stream } = payload;
+  const { symbol, channel } = parseStream(stream);
 
-  if (channel == "trade") {
-    handleSpotTrade(data);
-    return { exchange: exchange, market, symbol, trades };
-  } else if (channel.startsWith("depth")) {
-    handleSpotDepth(data);
-    return { exchange: exchange, market, symbol, orderbook };
-  } else {
-    console.error(`Unsupported exchange: ${exchange}`);
+  if (market === "spot") {
+    if (channel === "trade") {
+      const tradeData = handleSpotTrade(data);
+      return { exchange, market, symbol, channel: "trades", data: tradeData };
+    } else if (channel.startsWith("depth")) {
+      const orderbookData = handleSpotDepth(data);
+      return {
+        exchange,
+        market,
+        symbol,
+        channel: "orderbook",
+        data: orderbookData,
+      };
+    } else {
+      console.error(
+        `Unsupported channel: ${channel} for exchange: ${exchange}`
+      );
+      return null;
+    }
+  } else if (market === "futures") {
     return null;
   }
 }
 
 function handleSpotTrade(data) {
-  trades = {
-    eventType: data.e,
+  return {
     eventTime: data.E,
     tradeId: data.t,
     price: data.p,
@@ -32,16 +39,15 @@ function handleSpotTrade(data) {
 }
 
 function handleSpotDepth(data) {
-  orderbook = {
-    lastUpdateId: data.lastUpdateId,
+  return {
     bids: data.bids,
     asks: data.asks,
   };
 }
 
-function handleStream(stream) {
+function parseStream(stream) {
   const atPos = stream.indexOf("@");
-  if (atPos < 0) return null;
+  if (atPos < 0) throw new Error(`Invalid stream format: ${stream}`);
   const symbol = stream.substring(0, atPos).toUpperCase();
   const channel = stream.substring(atPos + 1);
 
