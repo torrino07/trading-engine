@@ -46,9 +46,10 @@
 - Technical Analysis is Mostly Bullshit: https://amzn.to/2TU3M41
 
 
-node MarketDataHandling.js binance spot
+node MarketDataHandling.js 5555 5556 binance
+node TradingLogic.js 5556,5557 binance.spot coinbase.spot
+
 node MarketDataStore.js
-node TradingLogic.js binance spot parsed
 node ArchiveCleanLogs.js us-east-1 marketdata001-dev
 
 
