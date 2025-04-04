@@ -48,8 +48,8 @@
 
 node MarketDataHandling.js 5555 5556 binance
 node TradingLogic.js 5556,5557 binance.spot coinbase.spot
-
 node MarketDataStore.js 5556,5557 binance.spot coinbase.spot
+
 node ArchiveCleanLogs.js us-east-1 marketdata001-dev
 
 
