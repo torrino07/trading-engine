@@ -48,7 +48,7 @@ async function main() {
       const hourPart = now.toISOString().split("T")[1].slice(0, 2); // HH
       const minutePart = now.toISOString().split("T")[1].slice(3, 5); // mm
 
-      const partitionKey = `${exchange}/${market}/${symbol}/${channel}/${datePart}/${hourPart}/${minutePart}`;
+      const partitionKey = `${channel}/${exchange}/${market}/${symbol}/${datePart}/${hourPart}/${minutePart}`;
 
       // Get or create the partition object (in memory), but don't create file yet
       if (!partitions[partitionKey]) {
@@ -63,7 +63,7 @@ async function main() {
       }
 
       // Prepare the data to write
-      const dataBuffer = Buffer.isBuffer(data);
+      const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(JSON.stringify(data));
       const buffer = Buffer.alloc(12 + dataBuffer.length);
       buffer.writeBigInt64LE(timestamp, 0);
       buffer.writeUInt32LE(dataBuffer.length, 8);
