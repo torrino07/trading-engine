@@ -63,7 +63,21 @@ cargo run
 
 cargo run -- binance spot raw
 
-
-
 we need to give more information from the payload in cpp
 exchange and market
+
+
+node MarketDataStore.js 5556 binance.spot
+
+
+uv pip install
+
+uv lock
+uv venv
+source .venv/bin/activate
+uv run
+
+
+uv run --with jupyter jupyter lab
+
+deactivate
