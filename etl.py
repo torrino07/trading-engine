@@ -3,6 +3,8 @@ import json
 import struct
 import pandas
 import numpy
+import subprocess
+import os
 
 def find_minute_folders(hour_path: str) -> list:
     return sorted(Path(hour_path).glob("*"))
@@ -113,3 +115,27 @@ def run_etl(path, output_root):
     if all_rows:
         df_hour = pandas.concat(all_rows, ignore_index=True)
         write_parquet(df_hour, output_root)
+
+def sync_s3(region: str, host: str, output_root: str ) -> None:
+    os.environ["AWS_DEFAULT_REGION"] = region 
+
+    command = [
+        "aws",
+        "s3",
+        "sync",
+        f"{output_root}",
+        f"s3://{host}/output_parquet/",
+        "--exact-timestamps",
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True)
+
+    print("Output:", result.stdout)
+    print("Errors:", result.stderr)
+    
+def clean_up(folder_path) -> None:
+    try:
+        os.system(f"rm -rf {folder_path}")
+        print(f"Successfully deleted the folder: {folder_path}")
+    except Exception as e:
+        print(f"Error: {e}")
