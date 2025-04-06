@@ -14,7 +14,7 @@ LOG_FILE="/var/log/sync.binlogs.log"
 
 export AWS_DEFAULT_REGION="$AWS_REGION"
 
-aws s3 sync "$LOCAL_DIR" "$S3_PATH" --exact-timestamps 
+aws s3 sync "$LOCAL_DIR" "$S3_PATH" --exact-timestamps
 
 exit 0
 
