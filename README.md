@@ -52,6 +52,7 @@ node MarketDataStore.js 5556,5557 binance.spot coinbase.spot
 
 node ArchiveS3.js us-east-1 marketdata001-dev
 
+sync.binlogs.sh
 
 https://rust-hdl.org/
 
