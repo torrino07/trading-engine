@@ -1,6 +1,3 @@
 /js/node_modules/
-marketdata
-output_parquet
+binlogs
 target
-.venv
-__pycache__
