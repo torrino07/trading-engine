@@ -51,6 +51,7 @@ node TradingLogic.js 5556,5557 binance.spot coinbase.spot
 node MarketDataStore.js 5556,5557 binance.spot coinbase.spot
 
 node ArchiveS3.js us-east-1 marketdata001-dev
+node test.js 5556,5557 binance.spot 
 
 sync.binlogs.sh
 
