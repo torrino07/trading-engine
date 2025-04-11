@@ -1,5 +1,6 @@
 const zmq = require("zeromq");
 const { Buffer } = require("buffer");
+const os = require("os")
 const fs = require("fs");
 const path = require("path");
 
@@ -72,10 +73,8 @@ function createPartitionObj(partitionKey) {
 
 function createFileStreamForPartition(partitionObj) {
   const now = new Date();
-  const fileName = `marketdata-${now
-    .toISOString()
-    .replace(/[:.]/g, "-")}.binlog`;
-  const logDir = path.join(__dirname, "../binlogs", partitionObj.partitionKey);
+  const fileName = `marketdata-${now.toISOString().replace(/[:.]/g, "-")}.binlog`;
+  const logDir = path.join("/Users/dorian/mnt/shared_data/binlogs", partitionObj.partitionKey);
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
