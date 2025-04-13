@@ -32,7 +32,6 @@ async function main() {
         const currentPartition = activePartitions[baseKey];
 
         if (currentPartition.partitionKey !== partitionKey) {
-          // When the partition changes, simply end the current partition's stream.
           currentPartition.stream.end();
           activePartitions[baseKey] = createPartitionObj(partitionKey);
         }
