@@ -1,6 +1,6 @@
 const zmq = require("zeromq");
 const { Buffer } = require("buffer");
-const os = require("os")
+const os = require("os");
 const fs = require("fs");
 const path = require("path");
 
@@ -32,9 +32,8 @@ async function main() {
         const currentPartition = activePartitions[baseKey];
 
         if (currentPartition.partitionKey !== partitionKey) {
-          currentPartition.stream.end(() => {
-            createDoneFileForPartition(currentPartition);
-          });
+          // When the partition changes, simply end the current partition's stream.
+          currentPartition.stream.end();
           activePartitions[baseKey] = createPartitionObj(partitionKey);
         }
       } else {
@@ -82,24 +81,6 @@ function createFileStreamForPartition(partitionObj) {
   console.log(`Creating log file on disk for: ${filePath}`);
   partitionObj.filePath = filePath;
   partitionObj.stream = fs.createWriteStream(filePath, { flags: "a" });
-}
-
-function createDoneFileForPartition(partitionObj) {
-  if (!partitionObj.filePath) {
-    console.error(
-      "Cannot create .done file; no filePath for partition",
-      partitionObj.partitionKey
-    );
-    return;
-  }
-  const dir = path.dirname(partitionObj.filePath);
-  const doneFilePath = path.join(dir, ".done");
-  try {
-    fs.closeSync(fs.openSync(doneFilePath, "w"));
-    console.log(`Created .done file for partition: ${doneFilePath}`);
-  } catch (err) {
-    console.error(`Error creating .done file for ${doneFilePath}:`, err);
-  }
 }
 
 main();
