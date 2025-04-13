@@ -71,9 +71,10 @@ function createPartitionObj(partitionKey) {
 }
 
 function createFileStreamForPartition(partitionObj) {
+  const folderDir = "/Users/dorian/mnt/shared_data/binlogs"
   const now = new Date();
   const fileName = `marketdata-${now.toISOString().replace(/[:.]/g, "-")}.binlog`;
-  const logDir = path.join("/Users/dorian/mnt/shared_data/binlogs", partitionObj.partitionKey);
+  const logDir = path.join(folderDir, partitionObj.partitionKey);
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
