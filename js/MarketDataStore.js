@@ -16,7 +16,6 @@ async function main() {
 
   try {
     for await (const [topic, message] of sock) {
-      const timestamp = BigInt(Date.now()) * 1000000n;
       const { exchange, market, symbol, channel, data } = JSON.parse(message);
 
       const now = new Date();
@@ -47,7 +46,6 @@ async function main() {
         ? data
         : Buffer.from(JSON.stringify(data));
       const buffer = Buffer.alloc(12 + dataBuffer.length);
-      buffer.writeBigInt64LE(timestamp, 0);
       buffer.writeUInt32LE(dataBuffer.length, 8);
       dataBuffer.copy(buffer, 12);
 
