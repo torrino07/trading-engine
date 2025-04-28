@@ -1,6 +1,5 @@
 const zmq = require("zeromq");
 const { Buffer } = require("buffer");
-const os = require("os");
 const fs = require("fs");
 const path = require("path");
 
