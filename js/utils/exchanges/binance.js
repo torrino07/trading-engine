@@ -1,5 +1,5 @@
 function handleResponse(response) {
-  const { exchange, market, payload } = response;
+  const { exchange, market, ts, payload } = response;
   const { data, stream } = payload;
   const { symbol, channel } = parseStream(stream);
 
