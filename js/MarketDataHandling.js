@@ -17,8 +17,6 @@ async function main() {
     for await (const [topic, message] of subscriberSock) {
       const response = JSON.parse(message);
       const parsedData = handleResponse(response);
-
-      console.log(parsedData)
       const { market, channel } = parsedData;
 
       try {

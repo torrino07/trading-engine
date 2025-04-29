@@ -1,19 +1,19 @@
 function handleResponse(response) {
-  const { exchange, market, ts, payload } = response;
+  const { exchange, market, timestamp, payload } = response;
   const { data, stream } = payload;
   const { symbol, channel } = parseStream(stream);
 
   if (market === "spot") {
     if (channel === "trade") {
       const tradeData = handleSpotTrade(data);
-      return { exchange, market, symbol, ts, channel: "trades", data: tradeData };
+      return { exchange, market, symbol, timestamp, channel: "trades", data: tradeData };
     } else if (channel.startsWith("depth")) {
       const orderbookData = handleSpotDepth(data);
       return {
         exchange,
         market,
         symbol,
-        ts,
+        timestamp,
         channel: "orderbook",
         data: orderbookData,
       };
