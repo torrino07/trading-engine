@@ -6,13 +6,14 @@ function handleResponse(response) {
   if (market === "spot") {
     if (channel === "trade") {
       const tradeData = handleSpotTrade(data);
-      return { exchange, market, symbol, channel: "trades", data: tradeData };
+      return { exchange, market, symbol, ts, channel: "trades", data: tradeData };
     } else if (channel.startsWith("depth")) {
       const orderbookData = handleSpotDepth(data);
       return {
         exchange,
         market,
         symbol,
+        ts,
         channel: "orderbook",
         data: orderbookData,
       };
