@@ -2,7 +2,6 @@ function handleResponse(response) {
   const { exchange, market, ts, payload } = response;
   const { data, stream } = payload;
   const { symbol, channel } = parseStream(stream);
-  console.log(ts)
 
   if (market === "spot") {
     if (channel === "trade") {
