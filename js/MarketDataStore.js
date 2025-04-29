@@ -16,7 +16,7 @@ async function main() {
 
   try {
     for await (const [topic, message] of sock) {
-      const { exchange, market, symbol, channel, data } = JSON.parse(message);
+      const { exchange, market, symbol, ts, channel, data } = JSON.parse(message);
 
       const now = new Date();
       const datePart = now.toISOString().split("T")[0]; // YYYY-MM-DD
@@ -46,6 +46,7 @@ async function main() {
         ? data
         : Buffer.from(JSON.stringify(data));
       const buffer = Buffer.alloc(12 + dataBuffer.length);
+      buffer.writeBigInt64LE(ts, 0);
       buffer.writeUInt32LE(dataBuffer.length, 8);
       dataBuffer.copy(buffer, 12);
 
