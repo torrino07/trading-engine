@@ -46,7 +46,7 @@ async function main() {
         ? data
         : Buffer.from(JSON.stringify(data));
       const buffer = Buffer.alloc(12 + dataBuffer.length);
-      buffer.writeUIntLE(Number(ts), 0, 6);
+      buffer.writeBigUInt64LE(BigInt(ts), 0);
       buffer.writeUInt32LE(dataBuffer.length, 8);
       dataBuffer.copy(buffer, 12);
 
